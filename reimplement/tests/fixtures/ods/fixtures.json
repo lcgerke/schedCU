@@ -1,0 +1,55 @@
+{
+  "fixtures": [
+    {
+      "name": "valid_schedule.ods",
+      "type": "valid",
+      "shift_count": 150,
+      "columns": [
+        "Date",
+        "ShiftType",
+        "RequiredStaffing",
+        "SpecialtyConstraint",
+        "StudyType"
+      ],
+      "expected_errors": 0
+    },
+    {
+      "name": "partial_schedule.ods",
+      "type": "partial",
+      "shift_count": 50,
+      "columns": [
+        "Date",
+        "ShiftType",
+        "RequiredStaffing",
+        "SpecialtyConstraint"
+      ],
+      "expected_errors": 0
+    },
+    {
+      "name": "invalid_schedule.ods",
+      "type": "invalid",
+      "shift_count": 30,
+      "columns": [
+        "Date",
+        "ShiftType",
+        "RequiredStaffing",
+        "SpecialtyConstraint",
+        "StudyType"
+      ],
+      "expected_errors": 4
+    },
+    {
+      "name": "large_schedule.ods",
+      "type": "large",
+      "shift_count": 1200,
+      "columns": [
+        "Date",
+        "ShiftType",
+        "RequiredStaffing",
+        "SpecialtyConstraint",
+        "StudyType"
+      ],
+      "expected_errors": 0
+    }
+  ]
+}
