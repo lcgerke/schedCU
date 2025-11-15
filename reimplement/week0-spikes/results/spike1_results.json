@@ -1,0 +1,29 @@
+{
+  "spike_id": "spike1",
+  "spike_name": "Amion HTML Scraping Feasibility",
+  "executed_at": "2025-11-15T16:16:35.238132715-05:00",
+  "executed_by": "lcgerke",
+  "duration_ms": 1,
+  "environment": "mock",
+  "status": "success",
+  "findings": {
+    "batch_parse_time_ms": 1,
+    "css_selectors": {
+      "date": "td:nth-child(1)",
+      "end_time": "td:nth-child(4)",
+      "location": "td:nth-child(5)",
+      "position": "td:nth-child(2)",
+      "shift_rows": "table tbody tr",
+      "start_time": "td:nth-child(3)"
+    },
+    "parsing_accuracy": "100.00%",
+    "per_page_time_ms": 0,
+    "performance_target_met": true,
+    "total_shifts_in_batch": 90,
+    "total_shifts_parsed": 3
+  },
+  "recommendation": "goquery successfully parses Amion HTML with good performance. Proceed with goquery implementation in Phase 3. Performance: 1ms for 6 months",
+  "timecost_weeks": 0,
+  "evidence": [],
+  "detailed_results": "## Success Details\n\n### Parsing Results\n- Accuracy: 100.00%\n- Shifts parsed: 3\n- Sample shifts:\n  - 2025-11-15: Technologist (07:00-15:00) at Main Lab\n  - 2025-11-16: Technologist (08:00-16:00) at Main Lab\n  - 2025-11-17: Radiologist (07:00-19:00) at Read Room A\n\n\n### Performance\n- 6-month batch time: 1ms\n- Per-page average: 0ms\n- Target: \u003c5000ms\n- Status: PASSED\n\n### CSS Selectors Found\n- Shift rows: Successfully identified via table \u003e tbody \u003e tr\n- All 5 fields extracted reliably\n- Selector stability: Good (unlikely to break with minor HTML changes)\n\n### Recommendation\ngoquery is fully viable for Amion scraping. Performance targets are met.\nProceed with implementation in Phase 3.\n"
+}

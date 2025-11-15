@@ -1,0 +1,19 @@
+claude:
+    block_position: end
+    inject_tts_block: true
+project:
+    announce_name: true
+    name: schedCU
+    path: /home/lcgerke/schedCU
+tts:
+    enabled: true
+    project_name: schedCU
+    speed: 0.67
+    speeds:
+        error: 0.85
+        info: 0.5
+        success: 0.67
+    validation:
+        max_message_words: 50
+        require_project_line: true
+version: "2.0"

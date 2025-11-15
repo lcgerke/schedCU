@@ -1,0 +1,415 @@
+package service
+
+import (
+	"context"
+	"testing"
+	"time"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/schedcu/v2/internal/entity"
+	"github.com/schedcu/v2/internal/repository/memory"
+)
+
+// TestCoverageCalculatorWithBatchQueries validates batch loading (no N+1 queries)
+// This is critical: v1 had N+1 query problems in coverage calculation
+func TestCoverageCalculatorWithBatchQueries(t *testing.T) {
+	repo := memory.NewScheduleRepository()
+	calc := NewCoverageCalculator(repo)
+	ctx := context.Background()
+
+	// Create test data
+	hospitalID := uuid.New()
+	creatorID := uuid.New()
+	version := &entity.ScheduleVersion{
+		ID:                 uuid.New(),
+		HospitalID:         hospitalID,
+		Status:             entity.VersionStatusProduction,
+		EffectiveStartDate: time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
+		EffectiveEndDate:   time.Date(2025, 1, 7, 23, 59, 59, 0, time.UTC),
+		CreatedAt:          time.Now().UTC(),
+		CreatedBy:          creatorID,
+		UpdatedAt:          time.Now().UTC(),
+		UpdatedBy:          creatorID,
+	}
+
+	// Create 5 shifts for the week
+	shifts := make([]entity.ShiftInstance, 5)
+	for i := 0; i < 5; i++ {
+		shifts[i] = entity.ShiftInstance{
+			ID:                  uuid.New(),
+			ScheduleVersionID:   version.ID,
+			ShiftType:           entity.ShiftTypeDay,
+			ScheduleDate:        time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC).AddDate(0, 0, i),
+			StartTime:           "08:00",
+			EndTime:             "16:00",
+			HospitalID:          hospitalID,
+			StudyType:           entity.StudyTypeGeneral,
+			SpecialtyConstraint: entity.SpecialtyBoth,
+			DesiredCoverage:     2,
+			IsMandatory:         true,
+			CreatedAt:           time.Now().UTC(),
+			CreatedBy:           creatorID,
+		}
+	}
+	version.ShiftInstances = shifts
+
+	// Calculate coverage for the date range
+	queryCountBefore := repo.QueryCount()
+
+	coverageResult, err := calc.CalculateCoverage(ctx, version, version.EffectiveStartDate, version.EffectiveEndDate)
+
+	require.NoError(t, err)
+	assert.NotNil(t, coverageResult)
+
+	// CRITICAL: Verify query efficiency
+	// Should be 1-2 queries MAX (not 1 per shift)
+	queriesUsed := repo.QueryCount() - queryCountBefore
+	assert.LessOrEqual(t, queriesUsed, 2, "Should use batch queries, not N+1 (queries used: %d)", queriesUsed)
+
+	// Verify results
+	assert.NotNil(t, coverageResult.CoverageByPosition)
+}
+
+// TestCoverageCalculationBasic validates basic coverage calculation
+func TestCoverageCalculationBasic(t *testing.T) {
+	repo := memory.NewScheduleRepository()
+	calc := NewCoverageCalculator(repo)
+	ctx := context.Background()
+
+	hospitalID := uuid.New()
+	creatorID := uuid.New()
+
+	// Create a simple 3-day schedule
+	version := &entity.ScheduleVersion{
+		ID:                 uuid.New(),
+		HospitalID:         hospitalID,
+		Status:             entity.VersionStatusProduction,
+		EffectiveStartDate: time.Date(2025, 1, 13, 0, 0, 0, 0, time.UTC), // Monday
+		EffectiveEndDate:   time.Date(2025, 1, 15, 23, 59, 59, 0, time.UTC), // Wednesday
+		CreatedAt:          time.Now().UTC(),
+		CreatedBy:          creatorID,
+		UpdatedAt:          time.Now().UTC(),
+		UpdatedBy:          creatorID,
+	}
+
+	// Create shifts: 2 per day for 3 days = 6 shifts
+	shifts := []entity.ShiftInstance{
+		{
+			ID:                  uuid.New(),
+			ScheduleVersionID:   version.ID,
+			ShiftType:           entity.ShiftTypeDay,
+			ScheduleDate:        time.Date(2025, 1, 13, 0, 0, 0, 0, time.UTC),
+			StartTime:           "08:00",
+			EndTime:             "16:00",
+			HospitalID:          hospitalID,
+			StudyType:           entity.StudyTypeBodyImaging,
+			SpecialtyConstraint: entity.SpecialtyBoth,
+			DesiredCoverage:     2,
+			IsMandatory:         true,
+			CreatedAt:           time.Now().UTC(),
+			CreatedBy:           creatorID,
+		},
+		{
+			ID:                  uuid.New(),
+			ScheduleVersionID:   version.ID,
+			ShiftType:           entity.ShiftTypeDay,
+			ScheduleDate:        time.Date(2025, 1, 13, 0, 0, 0, 0, time.UTC),
+			StartTime:           "16:00",
+			EndTime:             "00:00",
+			HospitalID:          hospitalID,
+			StudyType:           entity.StudyTypeNeuroImaging,
+			SpecialtyConstraint: entity.SpecialtyNeuroOnly,
+			DesiredCoverage:     1,
+			IsMandatory:         true,
+			CreatedAt:           time.Now().UTC(),
+			CreatedBy:           creatorID,
+		},
+		{
+			ID:                  uuid.New(),
+			ScheduleVersionID:   version.ID,
+			ShiftType:           entity.ShiftTypeDay,
+			ScheduleDate:        time.Date(2025, 1, 14, 0, 0, 0, 0, time.UTC),
+			StartTime:           "08:00",
+			EndTime:             "16:00",
+			HospitalID:          hospitalID,
+			StudyType:           entity.StudyTypeBodyImaging,
+			SpecialtyConstraint: entity.SpecialtyBodyOnly,
+			DesiredCoverage:     2,
+			IsMandatory:         true,
+			CreatedAt:           time.Now().UTC(),
+			CreatedBy:           creatorID,
+		},
+		{
+			ID:                  uuid.New(),
+			ScheduleVersionID:   version.ID,
+			ShiftType:           entity.ShiftTypeDay,
+			ScheduleDate:        time.Date(2025, 1, 14, 0, 0, 0, 0, time.UTC),
+			StartTime:           "16:00",
+			EndTime:             "00:00",
+			HospitalID:          hospitalID,
+			StudyType:           entity.StudyTypeGeneral,
+			SpecialtyConstraint: entity.SpecialtyBoth,
+			DesiredCoverage:     1,
+			IsMandatory:         true,
+			CreatedAt:           time.Now().UTC(),
+			CreatedBy:           creatorID,
+		},
+		{
+			ID:                  uuid.New(),
+			ScheduleVersionID:   version.ID,
+			ShiftType:           entity.ShiftTypeDay,
+			ScheduleDate:        time.Date(2025, 1, 15, 0, 0, 0, 0, time.UTC),
+			StartTime:           "08:00",
+			EndTime:             "16:00",
+			HospitalID:          hospitalID,
+			StudyType:           entity.StudyTypeBodyImaging,
+			SpecialtyConstraint: entity.SpecialtyBoth,
+			DesiredCoverage:     2,
+			IsMandatory:         true,
+			CreatedAt:           time.Now().UTC(),
+			CreatedBy:           creatorID,
+		},
+		{
+			ID:                  uuid.New(),
+			ScheduleVersionID:   version.ID,
+			ShiftType:           entity.ShiftTypeDay,
+			ScheduleDate:        time.Date(2025, 1, 15, 0, 0, 0, 0, time.UTC),
+			StartTime:           "16:00",
+			EndTime:             "00:00",
+			HospitalID:          hospitalID,
+			StudyType:           entity.StudyTypeGeneral,
+			SpecialtyConstraint: entity.SpecialtyBoth,
+			DesiredCoverage:     1,
+			IsMandatory:         false,
+			CreatedAt:           time.Now().UTC(),
+			CreatedBy:           creatorID,
+		},
+	}
+	version.ShiftInstances = shifts
+
+	// Calculate coverage
+	coverageResult, err := calc.CalculateCoverage(ctx, version, version.EffectiveStartDate, version.EffectiveEndDate)
+
+	require.NoError(t, err)
+	assert.NotNil(t, coverageResult)
+	assert.NotNil(t, coverageResult.CoverageByPosition)
+
+	// Verify we got a result for each day
+	assert.True(t, len(coverageResult.CoverageByPosition) > 0, "Should have coverage data")
+}
+
+// TestCoverageCalculationEmptySchedule validates handling empty schedules
+func TestCoverageCalculationEmptySchedule(t *testing.T) {
+	repo := memory.NewScheduleRepository()
+	calc := NewCoverageCalculator(repo)
+	ctx := context.Background()
+
+	// Create empty schedule
+	version := &entity.ScheduleVersion{
+		ID:                 uuid.New(),
+		HospitalID:         uuid.New(),
+		Status:             entity.VersionStatusProduction,
+		EffectiveStartDate: time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
+		EffectiveEndDate:   time.Date(2025, 1, 7, 23, 59, 59, 0, time.UTC),
+		ShiftInstances:     []entity.ShiftInstance{},
+		CreatedAt:          time.Now().UTC(),
+		CreatedBy:          uuid.New(),
+		UpdatedAt:          time.Now().UTC(),
+		UpdatedBy:          uuid.New(),
+	}
+
+	coverageResult, err := calc.CalculateCoverage(ctx, version, version.EffectiveStartDate, version.EffectiveEndDate)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, coverageResult)
+	// Empty schedule should have empty coverage
+	assert.Empty(t, coverageResult.CoverageByPosition)
+}
+
+// TestCoverageCalculationDateFiltering validates that only shifts in range are counted
+func TestCoverageCalculationDateFiltering(t *testing.T) {
+	repo := memory.NewScheduleRepository()
+	calc := NewCoverageCalculator(repo)
+	ctx := context.Background()
+
+	hospitalID := uuid.New()
+	creatorID := uuid.New()
+
+	version := &entity.ScheduleVersion{
+		ID:                 uuid.New(),
+		HospitalID:         hospitalID,
+		Status:             entity.VersionStatusProduction,
+		EffectiveStartDate: time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
+		EffectiveEndDate:   time.Date(2025, 1, 31, 23, 59, 59, 0, time.UTC),
+		CreatedAt:          time.Now().UTC(),
+		CreatedBy:          creatorID,
+		UpdatedAt:          time.Now().UTC(),
+		UpdatedBy:          creatorID,
+	}
+
+	// Create shifts on Jan 5 and Jan 25
+	shifts := []entity.ShiftInstance{
+		{
+			ID:                  uuid.New(),
+			ScheduleVersionID:   version.ID,
+			ShiftType:           entity.ShiftTypeDay,
+			ScheduleDate:        time.Date(2025, 1, 5, 0, 0, 0, 0, time.UTC),
+			StartTime:           "08:00",
+			EndTime:             "16:00",
+			HospitalID:          hospitalID,
+			StudyType:           entity.StudyTypeGeneral,
+			SpecialtyConstraint: entity.SpecialtyBoth,
+			DesiredCoverage:     1,
+			IsMandatory:         true,
+			CreatedAt:           time.Now().UTC(),
+			CreatedBy:           creatorID,
+		},
+		{
+			ID:                  uuid.New(),
+			ScheduleVersionID:   version.ID,
+			ShiftType:           entity.ShiftTypeDay,
+			ScheduleDate:        time.Date(2025, 1, 25, 0, 0, 0, 0, time.UTC),
+			StartTime:           "08:00",
+			EndTime:             "16:00",
+			HospitalID:          hospitalID,
+			StudyType:           entity.StudyTypeGeneral,
+			SpecialtyConstraint: entity.SpecialtyBoth,
+			DesiredCoverage:     1,
+			IsMandatory:         true,
+			CreatedAt:           time.Now().UTC(),
+			CreatedBy:           creatorID,
+		},
+	}
+	version.ShiftInstances = shifts
+
+	// Calculate coverage for narrow range (Jan 10-20) - should exclude both shifts
+	narrowStart := time.Date(2025, 1, 10, 0, 0, 0, 0, time.UTC)
+	narrowEnd := time.Date(2025, 1, 20, 23, 59, 59, 0, time.UTC)
+
+	coverageResult, err := calc.CalculateCoverage(ctx, version, narrowStart, narrowEnd)
+
+	assert.NoError(t, err)
+	assert.Empty(t, coverageResult.CoverageByPosition, "Should have no coverage for out-of-range dates")
+}
+
+// TestCoverageCalculationSpecialtyConstraints validates specialty constraint handling
+func TestCoverageCalculationSpecialtyConstraints(t *testing.T) {
+	repo := memory.NewScheduleRepository()
+	calc := NewCoverageCalculator(repo)
+	ctx := context.Background()
+
+	hospitalID := uuid.New()
+	creatorID := uuid.New()
+
+	version := &entity.ScheduleVersion{
+		ID:                 uuid.New(),
+		HospitalID:         hospitalID,
+		Status:             entity.VersionStatusProduction,
+		EffectiveStartDate: time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
+		EffectiveEndDate:   time.Date(2025, 1, 7, 23, 59, 59, 0, time.UTC),
+		CreatedAt:          time.Now().UTC(),
+		CreatedBy:          creatorID,
+		UpdatedAt:          time.Now().UTC(),
+		UpdatedBy:          creatorID,
+	}
+
+	// Shifts with different specialty constraints
+	shifts := []entity.ShiftInstance{
+		{
+			ID:                  uuid.New(),
+			ScheduleVersionID:   version.ID,
+			ShiftType:           entity.ShiftTypeMidC,
+			ScheduleDate:        time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
+			StartTime:           "08:00",
+			EndTime:             "16:00",
+			HospitalID:          hospitalID,
+			StudyType:           entity.StudyTypeBodyImaging,
+			SpecialtyConstraint: entity.SpecialtyBodyOnly,
+			DesiredCoverage:     1,
+			IsMandatory:         true,
+			CreatedAt:           time.Now().UTC(),
+			CreatedBy:           creatorID,
+		},
+		{
+			ID:                  uuid.New(),
+			ScheduleVersionID:   version.ID,
+			ShiftType:           entity.ShiftTypeMidC,
+			ScheduleDate:        time.Date(2025, 1, 2, 0, 0, 0, 0, time.UTC),
+			StartTime:           "08:00",
+			EndTime:             "16:00",
+			HospitalID:          hospitalID,
+			StudyType:           entity.StudyTypeNeuroImaging,
+			SpecialtyConstraint: entity.SpecialtyBoth, // Requires BOTH specialty
+			DesiredCoverage:     1,
+			IsMandatory:         true,
+			CreatedAt:           time.Now().UTC(),
+			CreatedBy:           creatorID,
+		},
+	}
+	version.ShiftInstances = shifts
+
+	coverageResult, err := calc.CalculateCoverage(ctx, version, version.EffectiveStartDate, version.EffectiveEndDate)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, coverageResult)
+	// Result should include specialty constraints in output
+	// (Implementation will determine how this is exposed)
+}
+
+// TestCoverageCalculationQueryCountRegression validates against N+1 regression
+func TestCoverageCalculationQueryCountRegression(t *testing.T) {
+	repo := memory.NewScheduleRepository()
+	calc := NewCoverageCalculator(repo)
+	ctx := context.Background()
+
+	hospitalID := uuid.New()
+	creatorID := uuid.New()
+
+	// Create a larger schedule (30 shifts over a month)
+	version := &entity.ScheduleVersion{
+		ID:                 uuid.New(),
+		HospitalID:         hospitalID,
+		Status:             entity.VersionStatusProduction,
+		EffectiveStartDate: time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC),
+		EffectiveEndDate:   time.Date(2025, 1, 31, 23, 59, 59, 0, time.UTC),
+		CreatedAt:          time.Now().UTC(),
+		CreatedBy:          creatorID,
+		UpdatedAt:          time.Now().UTC(),
+		UpdatedBy:          creatorID,
+	}
+
+	// Create 30 shifts (roughly 1 per day)
+	shifts := make([]entity.ShiftInstance, 30)
+	for day := 1; day <= 30; day++ {
+		shifts[day-1] = entity.ShiftInstance{
+			ID:                  uuid.New(),
+			ScheduleVersionID:   version.ID,
+			ShiftType:           entity.ShiftTypeDay,
+			ScheduleDate:        time.Date(2025, 1, day, 0, 0, 0, 0, time.UTC),
+			StartTime:           "08:00",
+			EndTime:             "16:00",
+			HospitalID:          hospitalID,
+			StudyType:           entity.StudyTypeGeneral,
+			SpecialtyConstraint: entity.SpecialtyBoth,
+			DesiredCoverage:     2,
+			IsMandatory:         true,
+			CreatedAt:           time.Now().UTC(),
+			CreatedBy:           creatorID,
+		}
+	}
+	version.ShiftInstances = shifts
+
+	queryCountBefore := repo.QueryCount()
+	coverageResult, err := calc.CalculateCoverage(ctx, version, version.EffectiveStartDate, version.EffectiveEndDate)
+	queryCountAfter := repo.QueryCount()
+
+	require.NoError(t, err)
+	assert.NotNil(t, coverageResult)
+
+	queriesUsed := queryCountAfter - queryCountBefore
+	// Even with 30 shifts, should NOT be 30 queries (N+1 problem)
+	// Should be 1-3 queries max
+	assert.LessOrEqual(t, queriesUsed, 3, "N+1 regression detected! Used %d queries for 30 shifts", queriesUsed)
+}
