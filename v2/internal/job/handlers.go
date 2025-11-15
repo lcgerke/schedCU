@@ -52,7 +52,7 @@ func (h *JobHandlers) HandleODSImport(ctx context.Context, t *asynq.Task) error 
 	log.Printf("Executing ODS import job: hospital=%s, filename=%s", payload.HospitalID, payload.Filename)
 
 	// Get the schedule version
-	version, err := h.versionService.GetVersion(ctx, payload.VersionID)
+	_, err := h.versionService.GetVersion(ctx, payload.VersionID)
 	if err != nil {
 		log.Printf("Failed to get schedule version: %v", err)
 		return fmt.Errorf("schedule version not found: %w", err)
@@ -102,13 +102,13 @@ func (h *JobHandlers) HandleAmionScrape(ctx context.Context, t *asynq.Task) erro
 		return fmt.Errorf("amion scrape error: %w", err)
 	}
 
-	if batch.Status == entity.ScrapeBatchStatusFailed {
-		log.Printf("Amion scrape produced no valid data: %s", batch.ErrorMessage)
-		return fmt.Errorf("amion scrape failed: %s", batch.ErrorMessage)
+	if batch.State == entity.BatchStateFailed {
+		log.Printf("Amion scrape produced no valid data: %s", *batch.ErrorMessage)
+		return fmt.Errorf("amion scrape failed: %s", *batch.ErrorMessage)
 	}
 
 	log.Printf("Amion scrape completed: hospital=%s, records=%d, errors=%d",
-		payload.HospitalID, batch.RecordCount, len(result.GetErrors()))
+		payload.HospitalID, batch.RowCount, len(result.Messages))
 
 	return nil
 }
@@ -125,20 +125,20 @@ func (h *JobHandlers) HandleCoverageCalculation(ctx context.Context, t *asynq.Ta
 		payload.ScheduleVersionID, payload.StartDate, payload.EndDate)
 
 	// Calculate coverage
-	coverage, result := h.coverageCalc.CalculateCoverageForSchedule(
+	_, err := h.coverageCalc.CalculateCoverageForSchedule(
 		ctx,
 		payload.ScheduleVersionID,
 		payload.StartDate,
 		payload.EndDate,
 	)
 
-	if coverage == nil {
-		log.Printf("Coverage calculation failed")
-		return fmt.Errorf("coverage calculation failed: %v", result.GetErrors())
+	if err != nil {
+		log.Printf("Coverage calculation failed: %v", err)
+		return fmt.Errorf("coverage calculation failed: %w", err)
 	}
 
-	log.Printf("Coverage calculation completed: version=%s, gaps=%d",
-		payload.ScheduleVersionID, len(result.GetErrors()))
+	log.Printf("Coverage calculation completed: version=%s",
+		payload.ScheduleVersionID)
 
 	return nil
 }

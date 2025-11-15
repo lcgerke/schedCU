@@ -71,6 +71,12 @@ func (r *Result) Add(severity Severity, code, text string, context map[string]in
 	return r
 }
 
+// AddMessages adds multiple messages from another result
+func (r *Result) AddMessages(messages ...Message) *Result {
+	r.Messages = append(r.Messages, messages...)
+	return r
+}
+
 // IsValid returns true if no ERROR messages
 func (r *Result) IsValid() bool {
 	for _, msg := range r.Messages {

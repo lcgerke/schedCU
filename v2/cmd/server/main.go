@@ -7,70 +7,74 @@ import (
 	"os"
 	"time"
 
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"github.com/schedcu/v2/internal/api/handlers"
+	"github.com/schedcu/v2/internal/api"
+	"github.com/schedcu/v2/internal/job"
 	"github.com/schedcu/v2/internal/repository/memory"
 	"github.com/schedcu/v2/internal/service"
 )
 
 func main() {
-	// Create echo instance
-	e := echo.New()
-
-	// Middleware
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-
-	// For Phase 0, use in-memory repository
-	// In production, this would be PostgreSQL
-	repo := memory.NewScheduleRepository()
-
-	// Create service layer
-	scheduleSvc := service.NewScheduleService(repo)
-
-	// Create handlers
-	scheduleHandler := handlers.NewScheduleHandler(scheduleSvc)
-
-	// Health check endpoint
-	e.GET("/api/health", handlers.HealthCheck)
-
-	// Schedule routes
-	e.POST("/api/schedules", scheduleHandler.CreateSchedule)
-	e.GET("/api/schedules/:id", scheduleHandler.GetSchedule)
-	e.PUT("/api/schedules/:id", scheduleHandler.UpdateSchedule)
-	e.DELETE("/api/schedules/:id", scheduleHandler.DeleteSchedule)
-
-	// Hospital-scoped routes
-	e.GET("/api/hospitals/:hospital_id/schedules", scheduleHandler.GetSchedulesForHospital)
-
-	// Shift routes
-	e.POST("/api/schedules/:id/shifts", scheduleHandler.AddShift)
-
 	// Get server address from environment or use default
 	addr := os.Getenv("SERVER_ADDR")
 	if addr == "" {
 		addr = ":8080"
 	}
 
-	// Graceful shutdown
+	// For Phase 0, use in-memory repositories
+	// In production (Phase 1 Week 4), these would be PostgreSQL
+	// Note: Full repository implementations will be added in Phase 1 Week 4
+	_ = memory.NewScheduleRepository() // Placeholder for now
+
+	// Create service layer (placeholder for Phase 0)
+	// Full implementations will be added in Phase 1
+	// For now, we're testing the API routing structure
+	coverageCalc := service.NewDynamicCoverageCalculator(nil, nil)
+	var versionService *service.ScheduleVersionService
+	// versionService will be properly initialized in Phase 1 Week 4
+
+	// Create job scheduler (requires Redis)
+	// For now, this will be initialized when Redis is available
+	var scheduler *job.JobScheduler
+	redisAddr := os.Getenv("REDIS_ADDR")
+	if redisAddr == "" {
+		redisAddr = "localhost:6379"
+	}
+	var err error
+	scheduler, err = job.NewJobScheduler(redisAddr)
+	if err != nil {
+		log.Printf("Warning: Failed to initialize job scheduler: %v (jobs will not be queued)", err)
+	}
+
+	// Create API router with all services
+	serviceDeps := &api.ServiceDeps{
+		OdsImporter:    nil, // TODO: Initialize in Phase 3
+		AmionImporter:  nil, // TODO: Initialize in Phase 3
+		Orchestrator:   nil, // TODO: Initialize in Phase 3
+		CoverageCalc:   coverageCalc,
+		VersionService: versionService,
+	}
+
+	router := api.NewRouter(scheduler, serviceDeps)
+
+	// Graceful shutdown with timeout
 	go func() {
 		log.Printf("Starting server on %s...\n", addr)
-		if err := e.Start(addr); err != nil && err != http.ErrServerClosed {
+		if err := router.Start(addr); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Failed to start server: %v", err)
 		}
 	}()
 
-	// Create a channel to handle shutdown signal
-	// In production, this would use os.Signal
+	// Keep server running for development
+	// In production, this would use os.Signal and proper shutdown
 	select {
-	case <-time.After(1 * time.Hour): // Just keep running for development
+	case <-time.After(24 * time.Hour): // Run for a day before stopping
 		log.Println("Shutting down server...")
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
-		if err := e.Shutdown(ctx); err != nil {
+		if err := router.Shutdown(); err != nil {
 			log.Fatalf("Server shutdown error: %v", err)
 		}
+		_ = shutdownCtx // Suppress unused warning if not used in Shutdown()
 	}
 }

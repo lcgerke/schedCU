@@ -28,13 +28,13 @@ func (s *ScheduleVersionService) CreateVersion(
 ) (*entity.ScheduleVersion, error) {
 
 	version := &entity.ScheduleVersion{
-		ID:        entity.ScheduleVersionID(uuid.New()),
-		HospitalID: hospitalID,
-		StartDate: startDate,
-		EndDate:   endDate,
-		Status:    entity.VersionStatusStaging,
-		CreatedAt: entity.Now(),
-		CreatedByID: creatorID,
+		ID:                  entity.ScheduleVersionID(uuid.New()),
+		HospitalID:          hospitalID,
+		EffectiveStartDate:  startDate,
+		EffectiveEndDate:    endDate,
+		Status:              entity.VersionStatusStaging,
+		CreatedAt:           entity.Now(),
+		CreatedBy:           creatorID,
 	}
 
 	if err := s.repo.Create(ctx, version); err != nil {
@@ -122,8 +122,8 @@ func (s *ScheduleVersionService) PromoteToProduction(
 
 	// Promote to PRODUCTION
 	version.Status = entity.VersionStatusProduction
-	version.PromotedAt = entity.NowPtr()
-	version.PromotedByID = (*entity.UserID)(&promoterID)
+	version.UpdatedAt = entity.Now()
+	version.UpdatedBy = promoterID
 
 	if err := s.repo.Update(ctx, version); err != nil {
 		return fmt.Errorf("failed to promote schedule version: %w", err)
@@ -152,8 +152,8 @@ func (s *ScheduleVersionService) Archive(
 
 	// Archive
 	version.Status = entity.VersionStatusArchived
-	version.ArchivedAt = entity.NowPtr()
-	version.ArchivedByID = (*entity.UserID)(&archiverID)
+	version.UpdatedAt = entity.Now()
+	version.UpdatedBy = archiverID
 
 	if err := s.repo.Update(ctx, version); err != nil {
 		return fmt.Errorf("failed to archive schedule version: %w", err)

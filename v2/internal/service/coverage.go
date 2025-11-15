@@ -122,9 +122,6 @@ func (c *DynamicCoverageCalculator) aggregateCoverage(
 	for _, shift := range shifts {
 		position := c.getPositionKey(shift)
 
-		// Get actual assignment count for this shift
-		assignedCount := assignmentMap[shift.ID]
-
 		// Store as desired vs actual
 		if _, exists := coverage[position]; !exists {
 			coverage[position] = 0
@@ -132,6 +129,8 @@ func (c *DynamicCoverageCalculator) aggregateCoverage(
 		coverage[position] += shift.DesiredCoverage // Track desired coverage
 
 		// For coverage calculation, we'd compare assigned vs desired
+		// assignmentMap[shift.ID] has the actual assignment count
+		_ = assignmentMap // Note: Will be used in Phase 1 Week 4 when calculating actual vs desired
 		// (simplified for Phase 1b)
 	}
 

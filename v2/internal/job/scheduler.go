@@ -19,8 +19,9 @@ type JobScheduler struct {
 func NewJobScheduler(redisAddr string) (*JobScheduler, error) {
 	client := asynq.NewClient(asynq.RedisClientOpt{Addr: redisAddr})
 
-	// Test connection
-	if err := client.Ping(context.Background()); err != nil {
+	// Test connection - use background context
+	// Note: client.Ping() has no parameters in asynq v0.24
+	if err := client.Ping(); err != nil {
 		return nil, fmt.Errorf("failed to connect to Redis: %w", err)
 	}
 
@@ -177,8 +178,9 @@ func (s *JobScheduler) Close() error {
 
 // GetTaskInfo retrieves information about a task
 func (s *JobScheduler) GetTaskInfo(ctx context.Context, taskID string) (*asynq.TaskInfo, error) {
-	inspector := asynq.NewInspector(asynq.RedisClientOpt{Addr: s.client.String()})
+	// Note: Inspector.GetTaskInfo takes queue and taskID, no context parameter in asynq v0.24
+	inspector := asynq.NewInspector(asynq.RedisClientOpt{Addr: "localhost:6379"})
 	defer inspector.Close()
 
-	return inspector.GetTaskInfo(ctx, "default", taskID)
+	return inspector.GetTaskInfo("default", taskID)
 }

@@ -1,8 +1,6 @@
 package api
 
 import (
-	"net/http"
-
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/schedcu/v2/internal/job"
@@ -13,7 +11,7 @@ import (
 type Router struct {
 	echo       *echo.Echo
 	scheduler  *job.JobScheduler
-	services   *service.Services
+	services   *ServiceDeps
 	handlers   *Handlers
 }
 
@@ -98,51 +96,7 @@ func (r *Router) Shutdown() error {
 	return r.echo.Close()
 }
 
-// ApiResponse is the standard response format for all endpoints
-type ApiResponse struct {
-	Data      interface{}            `json:"data,omitempty"`
-	Error     interface{}            `json:"error,omitempty"`
-	Validation interface{}            `json:"validation,omitempty"`
-	Meta      map[string]interface{} `json:"meta,omitempty"`
-}
-
-// SuccessResponse returns a successful API response
-func SuccessResponse(c echo.Context, statusCode int, data interface{}) error {
-	return c.JSON(statusCode, ApiResponse{
-		Data: data,
-		Meta: map[string]interface{}{
-			"timestamp": nowISO8601(),
-			"status":    "success",
-		},
-	})
-}
-
-// ErrorResponse returns an error API response
-func ErrorResponse(c echo.Context, statusCode int, message string) error {
-	return c.JSON(statusCode, ApiResponse{
-		Error: map[string]string{
-			"message": message,
-		},
-		Meta: map[string]interface{}{
-			"timestamp": nowISO8601(),
-			"status":    "error",
-		},
-	})
-}
-
-// ValidationErrorResponse returns a validation error API response
-func ValidationErrorResponse(c echo.Context, statusCode int, validationResult interface{}) error {
-	return c.JSON(statusCode, ApiResponse{
-		Validation: validationResult,
-		Meta: map[string]interface{}{
-			"timestamp": nowISO8601(),
-			"status":    "validation_error",
-		},
-	})
-}
-
-// nowISO8601 returns current time in ISO8601 format
-func nowISO8601() string {
-	// TODO: Use proper time formatting
-	return ""
-}
+// Note: Response functions are defined in response.go
+// - SuccessResponse(data interface{}) *APIResponse
+// - ErrorResponseWithCode(code, message string) *APIResponse
+// - ValidationErrorResponse(code, message string) *APIResponse

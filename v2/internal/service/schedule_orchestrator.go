@@ -87,7 +87,9 @@ func (o *ScheduleOrchestrator) ExecuteFullWorkflow(
 		odsContent,
 	)
 	result.OdsBatch = odsBatch
-	result.ValidationResult.AddMessages(odsResult.Messages...)
+	for _, msg := range odsResult.Messages {
+		result.ValidationResult.Add(msg.Severity, msg.Code, msg.Text, msg.Context)
+	}
 
 	if err != nil {
 		result.Error = fmt.Errorf("phase 1 (ODS import) failed: %w", err)
@@ -96,7 +98,7 @@ func (o *ScheduleOrchestrator) ExecuteFullWorkflow(
 	}
 
 	// If ODS import failed completely, don't continue
-	if odsBatch.Status == entity.BatchStateFailed {
+	if odsBatch.State == entity.BatchStateFailed {
 		result.ValidationResult.AddError("ODS_IMPORT_FATAL", "ODS import did not produce any valid data")
 		return result
 	}
@@ -109,27 +111,31 @@ func (o *ScheduleOrchestrator) ExecuteFullWorkflow(
 		amionConfig,
 	)
 	result.AmionBatch = amionBatch
-	result.ValidationResult.AddMessages(amionResult.Messages...)
+	for _, msg := range amionResult.Messages {
+		result.ValidationResult.Add(msg.Severity, msg.Code, msg.Text, msg.Context)
+	}
 
 	if err != nil {
 		result.ValidationResult.AddWarning("AMION_IMPORT_FAILED", fmt.Sprintf("Amion import failed: %v (continuing with ODS data)", err))
 	}
 
 	// Even if Amion fails, we have ODS data, so continue to Phase 3
-	if amionBatch.Status == entity.BatchStateFailed {
+	if amionBatch.State == entity.BatchStateFailed {
 		result.ValidationResult.AddWarning("AMION_IMPORT_INCOMPLETE", "Amion import did not produce valid data, using ODS only")
 	}
 
 	// Phase 3: Coverage Resolution
 	// Calculate coverage to validate the schedule is complete
-	coverage, coverageErrors := o.coverageCalc.CalculateCoverageForSchedule(
+	coverage, coverageErr := o.coverageCalc.CalculateCoverageForSchedule(
 		ctx,
 		version.ID,
 		startDate,
 		endDate,
 	)
 	result.CoverageResult = coverage
-	result.ValidationResult.AddMessages(coverageErrors.Messages...)
+	if coverageErr != nil {
+		result.ValidationResult.AddError("COVERAGE_CALC_ERROR", fmt.Sprintf("Coverage calculation error: %v", coverageErr))
+	}
 
 	if coverage == nil {
 		result.ValidationResult.AddError("COVERAGE_CALCULATION_FAILED", "Failed to calculate coverage")
