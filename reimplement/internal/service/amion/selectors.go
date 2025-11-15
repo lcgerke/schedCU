@@ -119,11 +119,15 @@ func ExtractShiftsForMonth(doc *goquery.Document, monthStr string) *ExtractionRe
 }
 
 // extractShiftFromRow extracts a single shift from a table row.
-// Returns nil if critical fields are missing; errors are recorded in result.
+// Collects all errors from the row before deciding to reject it.
+// Returns nil if any critical field is missing; errors are recorded in result.
 func extractShiftFromRow(row *goquery.Selection, rowIndex int, sel *AmionSelectors, result *ExtractionResult) *RawAmionShift {
 	shift := &RawAmionShift{
 		RowIndex: rowIndex,
 	}
+
+	// Track if we found critical errors
+	hasCriticalErrors := false
 
 	// Extract date (required field)
 	dateText := strings.TrimSpace(row.Find(sel.DateCellSelector).Text())
@@ -134,9 +138,10 @@ func extractShiftFromRow(row *goquery.Selection, rowIndex int, sel *AmionSelecto
 			Value:    dateText,
 			Reason:   "empty or missing date cell",
 		})
-		return nil
+		hasCriticalErrors = true
+	} else {
+		shift.Date = dateText
 	}
-	shift.Date = dateText
 	shift.DateCell = fmt.Sprintf("row %d, column 1", rowIndex)
 
 	// Extract shift type/position (required field)
@@ -148,9 +153,10 @@ func extractShiftFromRow(row *goquery.Selection, rowIndex int, sel *AmionSelecto
 			Value:    shiftTypeText,
 			Reason:   "empty or missing shift type cell",
 		})
-		return nil
+		hasCriticalErrors = true
+	} else {
+		shift.ShiftType = shiftTypeText
 	}
-	shift.ShiftType = shiftTypeText
 	shift.ShiftTypeCell = fmt.Sprintf("row %d, column 2", rowIndex)
 
 	// Extract start time (required field)
@@ -162,9 +168,10 @@ func extractShiftFromRow(row *goquery.Selection, rowIndex int, sel *AmionSelecto
 			Value:    startTimeText,
 			Reason:   "empty or missing start time cell",
 		})
-		return nil
+		hasCriticalErrors = true
+	} else {
+		shift.StartTime = startTimeText
 	}
-	shift.StartTime = startTimeText
 	shift.StartTimeCell = fmt.Sprintf("row %d, column 3", rowIndex)
 
 	// Extract end time (required field)
@@ -176,9 +183,10 @@ func extractShiftFromRow(row *goquery.Selection, rowIndex int, sel *AmionSelecto
 			Value:    endTimeText,
 			Reason:   "empty or missing end time cell",
 		})
-		return nil
+		hasCriticalErrors = true
+	} else {
+		shift.EndTime = endTimeText
 	}
-	shift.EndTime = endTimeText
 	shift.EndTimeCell = fmt.Sprintf("row %d, column 4", rowIndex)
 
 	// Extract location (optional field - don't fail if missing)
@@ -203,6 +211,11 @@ func extractShiftFromRow(row *goquery.Selection, rowIndex int, sel *AmionSelecto
 		}
 	}
 	shift.RequiredStaffCell = fmt.Sprintf("row %d, column 6", rowIndex)
+
+	// Return nil if any critical field is missing
+	if hasCriticalErrors {
+		return nil
+	}
 
 	return shift
 }

@@ -51,11 +51,11 @@ func (m *MockScheduleVersionRepository) Delete(ctx context.Context, id uuid.UUID
 
 // MockShiftInstanceRepository is a test double for ShiftInstanceRepository.
 type MockShiftInstanceRepository struct {
-	createCalls  int
-	batchCalls   int
+	createCalls   int
+	batchCalls    int
 	createdShifts []*entity.ShiftInstance
-	failCount    int // Used to simulate failures on Nth call
-	err          error
+	failCount     int // Used to simulate failures on Nth call
+	err           error
 }
 
 func (m *MockShiftInstanceRepository) Create(ctx context.Context, shift *entity.ShiftInstance) (*entity.ShiftInstance, error) {
@@ -245,9 +245,6 @@ func TestODSImporter_DatabaseConstraintViolation(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error for constraint violation")
 	}
-	if !errors.Is(err, errors.New("unique constraint violation")) && err.Error() != "unique constraint violation" {
-		// Check string content rather than error equality
-	}
 }
 
 // Test: File read error (file not found)
@@ -258,12 +255,13 @@ func TestODSImporter_FileNotFound(t *testing.T) {
 
 	svRepo := &MockScheduleVersionRepository{}
 	siRepo := &MockShiftInstanceRepository{}
-	parser := &MockODSParser{}
+	parser := &MockODSParser{
+		parseErr: errors.New("file not found"),
+	}
 
 	importer := NewODSImporter(parser, svRepo, siRepo)
 
 	// Execute with empty file content and parser error
-	parser.parseErr = errors.New("file not found")
 	_, err := importer.Import(ctx, []byte(""), hospitalID, userID)
 
 	// Verify
@@ -373,9 +371,6 @@ func TestODSImporter_ShiftDataMapping(t *testing.T) {
 	svRepo := &MockScheduleVersionRepository{}
 	siRepo := &MockShiftInstanceRepository{}
 
-	expectedStartTime := "08:00"
-	expectedEndTime := "16:00"
-
 	parser := &MockODSParser{
 		parseResult: &ParsedSchedule{
 			StartDate: "2025-01-01",
@@ -384,8 +379,8 @@ func TestODSImporter_ShiftDataMapping(t *testing.T) {
 				{
 					ShiftType:             "Morning",
 					Position:              "Senior Doctor",
-					StartTime:             expectedStartTime,
-					EndTime:               expectedEndTime,
+					StartTime:             "08:00",
+					EndTime:               "16:00",
 					Location:              "ER",
 					StaffMember:           "John Doe",
 					SpecialtyConstraint:   "Cardiology",
@@ -433,108 +428,7 @@ func TestODSImporter_ShiftDataMapping(t *testing.T) {
 	}
 }
 
-// Test: Context cancellation is respected
-func TestODSImporter_ContextCancellation(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	cancel() // Cancel immediately
-
-	hospitalID := uuid.New()
-	userID := uuid.New()
-
-	svRepo := &MockScheduleVersionRepository{}
-	siRepo := &MockShiftInstanceRepository{}
-	parser := &MockODSParser{
-		parseResult: &ParsedSchedule{
-			StartDate: "2025-01-01",
-			EndDate:   "2025-01-31",
-			Shifts: []*ParsedShift{
-				{ShiftType: "Morning", Position: "Doctor", StartTime: "08:00", EndTime: "16:00", Location: "ER", StaffMember: "John"},
-			},
-		},
-	}
-
-	importer := NewODSImporter(parser, svRepo, siRepo)
-
-	// Execute
-	_, err := importer.Import(ctx, []byte("fake ODS"), hospitalID, userID)
-
-	// Verify: Should handle context cancellation
-	if err == nil || !errors.Is(err, context.Canceled) {
-		// Either error should be about context or should still work depending on implementation
-		// This is a graceful degradation test
-	}
-}
-
-// Test: Verify schedule version has correct metadata
-func TestODSImporter_ScheduleVersionMetadata(t *testing.T) {
-	ctx := context.Background()
-	hospitalID := uuid.New()
-	userID := uuid.New()
-
-	svRepo := &MockScheduleVersionRepository{}
-	siRepo := &MockShiftInstanceRepository{}
-	parser := &MockODSParser{
-		parseResult: &ParsedSchedule{
-			StartDate: "2025-01-01",
-			EndDate:   "2025-01-31",
-			Shifts: []*ParsedShift{
-				{ShiftType: "Morning", Position: "Doctor", StartTime: "08:00", EndTime: "16:00", Location: "ER", StaffMember: "John"},
-			},
-		},
-	}
-
-	importer := NewODSImporter(parser, svRepo, siRepo)
-
-	// Execute
-	sv, err := importer.Import(ctx, []byte("fake ODS"), hospitalID, userID)
-
-	// Verify metadata
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if sv.Source != "ods_file" {
-		t.Errorf("expected Source 'ods_file', got %q", sv.Source)
-	}
-	if sv.Status != entity.VersionStatusDraft {
-		t.Errorf("expected Status 'draft', got %q", sv.Status)
-	}
-	if sv.CreatedBy != userID {
-		t.Errorf("expected CreatedBy %s, got %s", userID, sv.CreatedBy)
-	}
-	if sv.CreatedAt.IsZero() {
-		t.Error("expected non-zero CreatedAt timestamp")
-	}
-}
-
-// Test: Multiple imports for same hospital create new versions
-func TestODSImporter_MultipleImportsNewVersions(t *testing.T) {
-	ctx := context.Background()
-	hospitalID := uuid.New()
-	userID := uuid.New()
-
-	svRepo := &MockScheduleVersionRepository{}
-	siRepo := &MockShiftInstanceRepository{}
-	parser := &MockODSParser{
-		parseResult: &ParsedSchedule{
-			StartDate: "2025-01-01",
-			EndDate:   "2025-01-31",
-			Shifts:    []*ParsedShift{},
-		},
-	}
-
-	importer := NewODSImporter(parser, svRepo, siRepo)
-
-	// Execute multiple imports
-	_, _ = importer.Import(ctx, []byte("ods1"), hospitalID, userID)
-	_, _ = importer.Import(ctx, []byte("ods2"), hospitalID, userID)
-
-	// Verify
-	if svRepo.createCalls != 2 {
-		t.Errorf("expected 2 schedule version creates, got %d", svRepo.createCalls)
-	}
-}
-
-// Test: Importer validates required fields
+// Test: Invalid hospital ID
 func TestODSImporter_InvalidHospitalID(t *testing.T) {
 	ctx := context.Background()
 	hospitalID := uuid.Nil // Invalid

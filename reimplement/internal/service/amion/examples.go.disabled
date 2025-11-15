@@ -1,0 +1,345 @@
+// Package amion provides Amion service integration for the schedCU system.
+package amion
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"time"
+)
+
+// ExampleBasicUsage demonstrates basic HTTP client usage.
+func ExampleBasicUsage() {
+	// Create a new HTTP client pointing to Amion service
+	client, err := NewAmionHTTPClient("https://amion.example.com")
+	if err != nil {
+		log.Fatal("Failed to create client:", err)
+	}
+	defer client.Close()
+
+	// Fetch and parse HTML from a URL
+	doc, err := client.FetchAndParseHTML("https://amion.example.com/schedule")
+	if err != nil {
+		log.Fatal("Failed to fetch:", err)
+	}
+
+	// Use goquery to extract data from the HTML document
+	title := doc.Find("h1").First().Text()
+	fmt.Println("Page title:", title)
+
+	// Iterate over elements
+	doc.Find("table tr").Each(func(i int, s *Selection) {
+		row := s.Find("td").Map(func(j int, cell *Selection) string {
+			return cell.Text()
+		})
+		fmt.Println("Row", i, ":", row)
+	})
+}
+
+// ExampleErrorHandling demonstrates proper error handling with typed errors.
+func ExampleErrorHandling() {
+	client, err := NewAmionHTTPClient("https://amion.example.com")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Close()
+
+	_, err = client.FetchAndParseHTML("https://amion.example.com/not-found")
+
+	// Check for specific error types
+	switch err := err.(type) {
+	case *HTTPError:
+		fmt.Printf("HTTP Error: Status %d - %s\n", err.StatusCode, err.Message)
+		if err.StatusCode == 404 {
+			fmt.Println("Page not found")
+		}
+
+	case *NetworkError:
+		fmt.Printf("Network Error: %v\n", err.Underlying)
+		fmt.Println("Failed to reach server, check connectivity")
+
+	case *ParseError:
+		fmt.Printf("Parse Error: %v\n", err.Underlying)
+		fmt.Println("Failed to parse HTML response")
+
+	case *RetryError:
+		fmt.Printf("Retry Error: Failed after %d attempts\n", err.Attempts)
+		fmt.Printf("Last status: %d\n", err.LastStatusCode)
+
+	default:
+		fmt.Printf("Unknown error: %v\n", err)
+	}
+}
+
+// ExampleRetryLogic demonstrates the automatic retry mechanism.
+// The client automatically retries on transient failures with exponential backoff.
+func ExampleRetryLogic() {
+	client, err := NewAmionHTTPClient("https://amion.example.com")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Close()
+
+	// The client will automatically retry on:
+	// - Server errors (5xx status codes)
+	// - Temporary network timeouts
+	// - Connection refused errors
+	//
+	// Retry strategy:
+	// - Attempt 1: Immediate
+	// - Attempt 2: After 1 second (2^0)
+	// - Attempt 3: After 2 seconds (2^1)
+	// - Attempt 4: After 4 seconds (2^2)
+	//
+	// Total max attempts: 4 (1 initial + 3 retries)
+
+	doc, err := client.FetchAndParseHTML("https://amion.example.com/api/data")
+	if err != nil {
+		if retryErr, ok := err.(*RetryError); ok {
+			fmt.Printf("Failed after %d attempts\n", retryErr.Attempts)
+		}
+	} else {
+		fmt.Println("Success:", doc.Find("title").Text())
+	}
+}
+
+// ExampleContextTimeout demonstrates context-based timeout control.
+func ExampleContextTimeout() {
+	client, err := NewAmionHTTPClient("https://amion.example.com")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Close()
+
+	// Create a context with a 10-second timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	// This request will fail if not completed within 10 seconds
+	doc, err := client.FetchAndParseHTMLWithContext(ctx, "https://amion.example.com/slow-endpoint")
+	if err != nil {
+		fmt.Println("Request failed:", err)
+	} else {
+		fmt.Println("Success:", doc.Find("body").Text())
+	}
+}
+
+// ExampleContextCancellation demonstrates context-based cancellation.
+func ExampleContextCancellation() {
+	client, err := NewAmionHTTPClient("https://amion.example.com")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	// Cancel the request after 2 seconds
+	go func() {
+		time.Sleep(2 * time.Second)
+		cancel()
+	}()
+
+	doc, err := client.FetchAndParseHTMLWithContext(ctx, "https://amion.example.com/data")
+	if err != nil {
+		fmt.Println("Request cancelled or failed:", err)
+	} else {
+		fmt.Println("Success:", doc.Find("body").Text())
+	}
+}
+
+// ExampleSessionManagement demonstrates cookie jar and session persistence.
+func ExampleSessionManagement() {
+	client, err := NewAmionHTTPClient("https://amion.example.com")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Close()
+
+	// First request might set session cookies
+	_, err = client.FetchAndParseHTML("https://amion.example.com/login")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Subsequent requests automatically include cookies
+	// This enables session persistence and authentication
+	doc, err := client.FetchAndParseHTML("https://amion.example.com/dashboard")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Dashboard accessed with session:", doc.Find("title").Text())
+}
+
+// ExampleGoQueryIntegration demonstrates using goquery for HTML parsing.
+func ExampleGoQueryIntegration() {
+	client, err := NewAmionHTTPClient("https://amion.example.com")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Close()
+
+	doc, err := client.FetchAndParseHTML("https://amion.example.com/schedule")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Find all shifts in the schedule
+	doc.Find(".shift").Each(func(i int, s *Selection) {
+		shiftID, _ := s.Attr("data-shift-id")
+		shiftName := s.Find(".shift-name").Text()
+		shiftTime := s.Find(".shift-time").Text()
+
+		fmt.Printf("Shift %d: %s (%s) - ID: %s\n", i+1, shiftName, shiftTime, shiftID)
+	})
+
+	// Extract table data
+	doc.Find("table tbody tr").Each(func(i int, row *Selection) {
+		cells := row.Find("td")
+		if cells.Length() >= 3 {
+			name := cells.Eq(0).Text()
+			date := cells.Eq(1).Text()
+			status := cells.Eq(2).Text()
+
+			fmt.Printf("Record %d: %s - %s - %s\n", i+1, name, date, status)
+		}
+	})
+}
+
+// ExampleUserAgent demonstrates how the client sets a realistic User-Agent.
+func ExampleUserAgent() {
+	client, err := NewAmionHTTPClient("https://amion.example.com")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Close()
+
+	// The client automatically sets a realistic User-Agent header:
+	// "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36..."
+	//
+	// This helps with:
+	// - Server-side detection of legitimate browser requests
+	// - Avoiding blocks by web scrapers detection systems
+	// - Compatibility with Amion's frontend requirements
+
+	doc, err := client.FetchAndParseHTML("https://amion.example.com")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Request completed with realistic User-Agent")
+	fmt.Println("Title:", doc.Find("title").Text())
+}
+
+// ExampleConnectionPooling demonstrates automatic connection pooling.
+func ExampleConnectionPooling() {
+	client, err := NewAmionHTTPClient("https://amion.example.com")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Close()
+
+	// Connection pooling is automatically enabled:
+	// - MaxIdleConns: 100 (total idle connections across all hosts)
+	// - MaxIdleConnsPerHost: 10 (per-host idle connections)
+	// - MaxConnsPerHost: 32 (concurrent connections per host)
+	// - IdleConnTimeout: 90 seconds (connection reuse window)
+	//
+	// This improves performance by reusing TCP connections
+	// across multiple requests.
+
+	for i := 0; i < 5; i++ {
+		doc, err := client.FetchAndParseHTML("https://amion.example.com/api/data")
+		if err == nil {
+			fmt.Printf("Request %d: %s\n", i+1, doc.Find("title").Text())
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	fmt.Println("All requests reused pooled connections")
+}
+
+// ExampleCompressionHandling demonstrates automatic gzip decompression.
+func ExampleCompressionHandling() {
+	client, err := NewAmionHTTPClient("https://amion.example.com")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Close()
+
+	// The client automatically handles:
+	// - gzip compression (Content-Encoding: gzip)
+	// - deflate compression
+	// - Charset detection (UTF-8, ISO-8859-1, etc.)
+	//
+	// Servers that send compressed responses will have them
+	// decompressed transparently before parsing.
+
+	doc, err := client.FetchAndParseHTML("https://amion.example.com/compressed-data")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Decompressed content:", doc.Find("body").Text())
+}
+
+// ExampleTimeouts demonstrates the 30-second request timeout.
+func ExampleTimeouts() {
+	client, err := NewAmionHTTPClient("https://amion.example.com")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Close()
+
+	// Default timeouts:
+	// - Request timeout: 30 seconds (total request duration)
+	// - Dial timeout: 30 seconds (TCP connection establishment)
+	// - TLS handshake timeout: 10 seconds
+	// - Response header timeout: 30 seconds
+	//
+	// For more granular control, use context with explicit timeout:
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	doc, err := client.FetchAndParseHTMLWithContext(ctx, "https://amion.example.com/api")
+	if err != nil {
+		fmt.Println("Request timeout or error:", err)
+	} else {
+		fmt.Println("Success:", doc.Find("body").Text())
+	}
+}
+
+// ExampleConcurrentRequests demonstrates thread-safe concurrent usage.
+func ExampleConcurrentRequests() {
+	client, err := NewAmionHTTPClient("https://amion.example.com")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Close()
+
+	// The AmionHTTPClient is safe for concurrent use.
+	// Multiple goroutines can safely call FetchAndParseHTML simultaneously.
+
+	// Example: Fetch multiple pages in parallel
+	urlChan := make(chan string, 3)
+	urlChan <- "https://amion.example.com/page1"
+	urlChan <- "https://amion.example.com/page2"
+	urlChan <- "https://amion.example.com/page3"
+	close(urlChan)
+
+	for url := range urlChan {
+		go func(u string) {
+			doc, err := client.FetchAndParseHTML(u)
+			if err == nil {
+				fmt.Printf("Fetched %s: %s\n", u, doc.Find("title").Text())
+			} else {
+				fmt.Printf("Failed to fetch %s: %v\n", u, err)
+			}
+		}(url)
+	}
+}
+
+// Placeholder type for goquery.Selection since we're in a code example context
+type Selection struct{}

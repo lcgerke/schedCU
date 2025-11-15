@@ -593,6 +593,7 @@ func TestEncodingDetection(t *testing.T) {
 // TestNetworkTimeout tests timeout handling with slow server.
 func TestNetworkTimeout(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Sleep longer than the client timeout
 		time.Sleep(35 * time.Second)
 		fmt.Fprint(w, "This should not be reached")
 	}))
@@ -603,20 +604,21 @@ func TestNetworkTimeout(t *testing.T) {
 		t.Fatalf("NewAmionHTTPClient failed: %v", err)
 	}
 
+	// Use context with shorter timeout than httpClient timeout
+	// to avoid waiting 30 seconds
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+
 	start := time.Now()
-	_, err = client.FetchAndParseHTML(server.URL)
+	_, err = client.FetchAndParseHTMLWithContext(ctx, server.URL)
 	elapsed := time.Since(start)
 
 	if err == nil {
 		t.Fatal("expected timeout error")
 	}
 
-	// Should timeout after ~30 seconds
-	if elapsed < 25*time.Second {
-		t.Errorf("timeout occurred too quickly: %v", elapsed)
-	}
-
-	if elapsed > 35*time.Second {
+	// Should timeout after ~1 second
+	if elapsed > 3*time.Second {
 		t.Errorf("timeout took too long: %v", elapsed)
 	}
 }

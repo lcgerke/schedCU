@@ -1,0 +1,1463 @@
+# github.com/schedcu/reimplement/internal/service/orchestrator [github.com/schedcu/reimplement/internal/service/orchestrator.test]
+internal/service/orchestrator/performance_test.go:289:6: unknown field UserID in struct literal of type entity.Assignment
+internal/service/orchestrator/performance_test.go:290:6: unknown field StartTime in struct literal of type entity.Assignment
+internal/service/orchestrator/performance_test.go:291:6: unknown field EndTime in struct literal of type entity.Assignment
+internal/service/orchestrator/performance_test.go:292:6: unknown field Position in struct literal of type entity.Assignment
+internal/service/orchestrator/performance_test.go:293:6: unknown field Status in struct literal of type entity.Assignment
+internal/service/orchestrator/performance_test.go:586:6: unknown field UserID in struct literal of type entity.Assignment
+internal/service/orchestrator/performance_test.go:587:6: unknown field StartTime in struct literal of type entity.Assignment
+internal/service/orchestrator/performance_test.go:588:6: unknown field EndTime in struct literal of type entity.Assignment
+internal/service/orchestrator/performance_test.go:589:6: unknown field Position in struct literal of type entity.Assignment
+internal/service/orchestrator/performance_test.go:590:6: unknown field Status in struct literal of type entity.Assignment
+internal/service/orchestrator/performance_test.go:590:6: too many errors
+	github.com/schedcu/reimplement/cmd/generate-ods-fixtures		coverage: 0.0% of statements
+=== RUN   TestFormatValidationErrors_SimpleError
+--- PASS: TestFormatValidationErrors_SimpleError (0.00s)
+=== RUN   TestFormatValidationErrors_MultipleErrors
+--- PASS: TestFormatValidationErrors_MultipleErrors (0.00s)
+=== RUN   TestFormatValidationErrors_WithWarnings
+--- PASS: TestFormatValidationErrors_WithWarnings (0.00s)
+=== RUN   TestFormatValidationErrors_WithInfos
+--- PASS: TestFormatValidationErrors_WithInfos (0.00s)
+=== RUN   TestFormatValidationErrors_EmptyValidationResult
+--- PASS: TestFormatValidationErrors_EmptyValidationResult (0.00s)
+=== RUN   TestFormatValidationErrors_ManyErrors
+--- PASS: TestFormatValidationErrors_ManyErrors (0.00s)
+=== RUN   TestFormatValidationErrors_SameFieldMultipleErrors
+--- PASS: TestFormatValidationErrors_SameFieldMultipleErrors (0.00s)
+=== RUN   TestFormatValidationErrors_ContextPreservation
+--- PASS: TestFormatValidationErrors_ContextPreservation (0.00s)
+=== RUN   TestFormatValidationErrors_JSONSerialization
+--- PASS: TestFormatValidationErrors_JSONSerialization (0.00s)
+=== RUN   TestFormatValidationErrors_IntegrationWithApiResponse
+--- PASS: TestFormatValidationErrors_IntegrationWithApiResponse (0.00s)
+=== RUN   TestFormatValidationErrors_NestedErrorStructure
+--- PASS: TestFormatValidationErrors_NestedErrorStructure (0.00s)
+=== RUN   TestFormatValidationErrors_ErrorMessageContent
+--- PASS: TestFormatValidationErrors_ErrorMessageContent (0.00s)
+=== RUN   TestFormatValidationErrors_DuplicateErrorsAggregation
+--- PASS: TestFormatValidationErrors_DuplicateErrorsAggregation (0.00s)
+=== RUN   TestFormatValidationErrors_MessageSummarization
+=== RUN   TestFormatValidationErrors_MessageSummarization/single_error
+=== RUN   TestFormatValidationErrors_MessageSummarization/multiple_errors
+=== RUN   TestFormatValidationErrors_MessageSummarization/errors_and_warnings
+=== RUN   TestFormatValidationErrors_MessageSummarization/all_types
+--- PASS: TestFormatValidationErrors_MessageSummarization (0.00s)
+    --- PASS: TestFormatValidationErrors_MessageSummarization/single_error (0.00s)
+    --- PASS: TestFormatValidationErrors_MessageSummarization/multiple_errors (0.00s)
+    --- PASS: TestFormatValidationErrors_MessageSummarization/errors_and_warnings (0.00s)
+    --- PASS: TestFormatValidationErrors_MessageSummarization/all_types (0.00s)
+=== RUN   TestFormatValidationErrors_EmptyFieldName
+--- PASS: TestFormatValidationErrors_EmptyFieldName (0.00s)
+=== RUN   TestMarshalSuccessResponseWithString
+--- PASS: TestMarshalSuccessResponseWithString (0.00s)
+=== RUN   TestMarshalSuccessResponseWithInt
+--- PASS: TestMarshalSuccessResponseWithInt (0.00s)
+=== RUN   TestMarshalSuccessResponseWithFloat
+--- PASS: TestMarshalSuccessResponseWithFloat (0.00s)
+=== RUN   TestMarshalSuccessResponseWithBool
+--- PASS: TestMarshalSuccessResponseWithBool (0.00s)
+=== RUN   TestMarshalSuccessResponseWithMap
+--- PASS: TestMarshalSuccessResponseWithMap (0.00s)
+=== RUN   TestMarshalSuccessResponseWithSlice
+--- PASS: TestMarshalSuccessResponseWithSlice (0.00s)
+=== RUN   TestMarshalSuccessResponseWithNestedObject
+--- PASS: TestMarshalSuccessResponseWithNestedObject (0.00s)
+=== RUN   TestErrorResponseWithMethod
+--- PASS: TestErrorResponseWithMethod (0.00s)
+=== RUN   TestErrorResponseWithDetails
+--- PASS: TestErrorResponseWithDetails (0.00s)
+=== RUN   TestResponseWithValidationResult
+--- PASS: TestResponseWithValidationResult (0.00s)
+=== RUN   TestRoundtripSimpleData
+--- PASS: TestRoundtripSimpleData (0.00s)
+=== RUN   TestRoundtripWithValidationResult
+--- PASS: TestRoundtripWithValidationResult (0.00s)
+=== RUN   TestRoundtripErrorResponseWithDetails
+--- PASS: TestRoundtripErrorResponseWithDetails (0.00s)
+=== RUN   TestNullErrorFieldOmitted
+--- PASS: TestNullErrorFieldOmitted (0.00s)
+=== RUN   TestValidationErrorsPresent
+--- PASS: TestValidationErrorsPresent (0.00s)
+=== RUN   TestIsSuccessTrueForSuccess
+--- PASS: TestIsSuccessTrueForSuccess (0.00s)
+=== RUN   TestIsSuccessFalseWithError
+--- PASS: TestIsSuccessFalseWithError (0.00s)
+=== RUN   TestIsSuccessFalseWithValidationErrors
+--- PASS: TestIsSuccessFalseWithValidationErrors (0.00s)
+=== RUN   TestIsSuccessTrueWithWarnings
+--- PASS: TestIsSuccessTrueWithWarnings (0.00s)
+=== RUN   TestMethodChaining
+--- PASS: TestMethodChaining (0.00s)
+=== RUN   TestMetaTimestampValid
+--- PASS: TestMetaTimestampValid (0.00s)
+=== RUN   TestMetaRequestIDNotEmpty
+--- PASS: TestMetaRequestIDNotEmpty (0.00s)
+=== RUN   TestMetaVersionPresent
+--- PASS: TestMetaVersionPresent (0.00s)
+=== RUN   TestMetaServerTimePresent
+--- PASS: TestMetaServerTimePresent (0.00s)
+=== RUN   TestEmptyValidationResult
+--- PASS: TestEmptyValidationResult (0.00s)
+=== RUN   TestComplexNestedDataTypes
+--- PASS: TestComplexNestedDataTypes (0.00s)
+=== RUN   TestResponseWithCustomStruct
+--- PASS: TestResponseWithCustomStruct (0.00s)
+=== RUN   TestRoundtripCustomStruct
+--- PASS: TestRoundtripCustomStruct (0.00s)
+=== RUN   TestValidationContextPreservation
+--- PASS: TestValidationContextPreservation (0.00s)
+=== RUN   TestResponseWithAllFieldsPopulated
+--- PASS: TestResponseWithAllFieldsPopulated (0.00s)
+=== RUN   TestErrorCodesProduceDifferentResponses
+--- PASS: TestErrorCodesProduceDifferentResponses (0.00s)
+=== RUN   TestLargePayloadHandling
+--- PASS: TestLargePayloadHandling (0.00s)
+=== RUN   TestSpecialCharactersEscaping
+--- PASS: TestSpecialCharactersEscaping (0.00s)
+=== RUN   TestWithErrorDetailsWithoutPriorError
+--- PASS: TestWithErrorDetailsWithoutPriorError (0.00s)
+=== RUN   TestValidationMessagesPreserved
+--- PASS: TestValidationMessagesPreserved (0.00s)
+=== RUN   TestJSONOutputExamples
+    response_test.go:662: Example 1 - Success Response:
+        {
+          "data": {
+            "id": "123",
+            "name": "Test"
+          },
+          "validation": {
+            "errors": [],
+            "warnings": [],
+            "infos": [],
+            "context": {}
+          },
+          "meta": {
+            "timestamp": "2025-11-15T17:33:05.081585267-05:00",
+            "request_id": "8dbcd772-8aa9-4d92-9055-e32e9bb64e47",
+            "version": "1.0",
+            "server_time": 1763245985
+          }
+        }
+    response_test.go:668: Example 2 - Error Response:
+        {
+          "data": "",
+          "validation": {
+            "errors": [],
+            "warnings": [],
+            "infos": [],
+            "context": {}
+          },
+          "error": {
+            "code": "INVALID_REQUEST",
+            "message": "Request is invalid"
+          },
+          "meta": {
+            "timestamp": "2025-11-15T17:33:05.081629991-05:00",
+            "request_id": "a7272798-88bd-4379-9fc6-ce876f2fc229",
+            "version": "1.0",
+            "server_time": 1763245985
+          }
+        }
+    response_test.go:675: Example 3 - Validation Error Response:
+        {
+          "data": "",
+          "validation": {
+            "errors": [
+              {
+                "field": "file_format",
+                "message": "Expected ODS format"
+              }
+            ],
+            "warnings": [],
+            "infos": [],
+            "context": {}
+          },
+          "meta": {
+            "timestamp": "2025-11-15T17:33:05.081659357-05:00",
+            "request_id": "d6e3ff07-5588-4066-b2ef-0d0e7ed4321c",
+            "version": "1.0",
+            "server_time": 1763245985
+          }
+        }
+--- PASS: TestJSONOutputExamples (0.00s)
+=== RUN   TestMapValidationToStatusWithErrors
+--- PASS: TestMapValidationToStatusWithErrors (0.00s)
+=== RUN   TestMapValidationToStatusWithMultipleErrors
+--- PASS: TestMapValidationToStatusWithMultipleErrors (0.00s)
+=== RUN   TestMapValidationToStatusWithWarningsOnly
+--- PASS: TestMapValidationToStatusWithWarningsOnly (0.00s)
+=== RUN   TestMapValidationToStatusWithMultipleWarnings
+--- PASS: TestMapValidationToStatusWithMultipleWarnings (0.00s)
+=== RUN   TestMapValidationToStatusWithInfosOnly
+--- PASS: TestMapValidationToStatusWithInfosOnly (0.00s)
+=== RUN   TestMapValidationToStatusWithMultipleInfos
+--- PASS: TestMapValidationToStatusWithMultipleInfos (0.00s)
+=== RUN   TestMapValidationToStatusEmpty
+--- PASS: TestMapValidationToStatusEmpty (0.00s)
+=== RUN   TestMapValidationToStatusNil
+--- PASS: TestMapValidationToStatusNil (0.00s)
+=== RUN   TestMapValidationPrecedenceErrorOverWarning
+--- PASS: TestMapValidationPrecedenceErrorOverWarning (0.00s)
+=== RUN   TestMapValidationPrecedenceErrorOverInfo
+--- PASS: TestMapValidationPrecedenceErrorOverInfo (0.00s)
+=== RUN   TestMapValidationPrecedenceErrorOverAll
+--- PASS: TestMapValidationPrecedenceErrorOverAll (0.00s)
+=== RUN   TestMapValidationPrecedenceWarningOverInfo
+--- PASS: TestMapValidationPrecedenceWarningOverInfo (0.00s)
+=== RUN   TestErrorCodeToHTTPStatusInvalidFileFormat
+--- PASS: TestErrorCodeToHTTPStatusInvalidFileFormat (0.00s)
+=== RUN   TestErrorCodeToHTTPStatusMissingRequiredField
+--- PASS: TestErrorCodeToHTTPStatusMissingRequiredField (0.00s)
+=== RUN   TestErrorCodeToHTTPStatusDuplicateEntry
+--- PASS: TestErrorCodeToHTTPStatusDuplicateEntry (0.00s)
+=== RUN   TestErrorCodeToHTTPStatusParseError
+--- PASS: TestErrorCodeToHTTPStatusParseError (0.00s)
+=== RUN   TestErrorCodeToHTTPStatusDatabaseError
+--- PASS: TestErrorCodeToHTTPStatusDatabaseError (0.00s)
+=== RUN   TestErrorCodeToHTTPStatusExternalServiceError
+--- PASS: TestErrorCodeToHTTPStatusExternalServiceError (0.00s)
+=== RUN   TestErrorCodeToHTTPStatusUnknownError
+--- PASS: TestErrorCodeToHTTPStatusUnknownError (0.00s)
+=== RUN   TestErrorCodeToHTTPStatusUnknownCode
+--- PASS: TestErrorCodeToHTTPStatusUnknownCode (0.00s)
+=== RUN   TestSeverityToDescriptionError
+--- PASS: TestSeverityToDescriptionError (0.00s)
+=== RUN   TestSeverityToDescriptionWarning
+--- PASS: TestSeverityToDescriptionWarning (0.00s)
+=== RUN   TestSeverityToDescriptionInfo
+--- PASS: TestSeverityToDescriptionInfo (0.00s)
+=== RUN   TestSeverityToDescriptionUnknown
+--- PASS: TestSeverityToDescriptionUnknown (0.00s)
+=== RUN   TestMessageCodeToDescriptionInvalidFileFormat
+--- PASS: TestMessageCodeToDescriptionInvalidFileFormat (0.00s)
+=== RUN   TestMessageCodeToDescriptionMissingRequiredField
+--- PASS: TestMessageCodeToDescriptionMissingRequiredField (0.00s)
+=== RUN   TestMessageCodeToDescriptionDuplicateEntry
+--- PASS: TestMessageCodeToDescriptionDuplicateEntry (0.00s)
+=== RUN   TestMessageCodeToDescriptionParseError
+--- PASS: TestMessageCodeToDescriptionParseError (0.00s)
+=== RUN   TestMessageCodeToDescriptionDatabaseError
+--- PASS: TestMessageCodeToDescriptionDatabaseError (0.00s)
+=== RUN   TestMessageCodeToDescriptionExternalServiceError
+--- PASS: TestMessageCodeToDescriptionExternalServiceError (0.00s)
+=== RUN   TestMessageCodeToDescriptionUnknownError
+--- PASS: TestMessageCodeToDescriptionUnknownError (0.00s)
+=== RUN   TestMessageCodeToDescriptionUnknownCode
+--- PASS: TestMessageCodeToDescriptionUnknownCode (0.00s)
+=== RUN   TestIsClientError
+--- PASS: TestIsClientError (0.00s)
+=== RUN   TestIsServerError
+--- PASS: TestIsServerError (0.00s)
+=== RUN   TestIsSuccess
+--- PASS: TestIsSuccess (0.00s)
+=== RUN   TestIntegrationErrorCodeToStatus
+--- PASS: TestIntegrationErrorCodeToStatus (0.00s)
+=== RUN   TestIntegrationValidationResultMapping
+--- PASS: TestIntegrationValidationResultMapping (0.00s)
+=== RUN   TestNewStatusMapper
+--- PASS: TestNewStatusMapper (0.00s)
+=== RUN   TestMapValidationZeroValueStruct
+--- PASS: TestMapValidationZeroValueStruct (0.00s)
+=== RUN   TestMultipleMapperInstances
+--- PASS: TestMultipleMapperInstances (0.00s)
+=== RUN   TestErrorCodeMappingConsistency
+--- PASS: TestErrorCodeMappingConsistency (0.00s)
+PASS
+coverage: 59.7% of statements
+ok  	github.com/schedcu/reimplement/internal/api	(cached)	coverage: 59.7% of statements
+	github.com/schedcu/reimplement/internal/entity		coverage: 0.0% of statements
+=== RUN   TestNewLoggerDevelopment
+2025-11-15T17:53:06.002-0500	[34mINFO[0m	logger/logger_test.go:25	test message
+--- PASS: TestNewLoggerDevelopment (0.00s)
+=== RUN   TestNewLoggerProduction
+{"level":"info","timestamp":"2025-11-15T17:53:06.002-0500","caller":"logger/logger_test.go:39","message":"test message"}
+--- PASS: TestNewLoggerProduction (0.00s)
+=== RUN   TestLoggerJSONOutput
+{"level":"info","timestamp":"2025-11-15T17:53:06.002-0500","caller":"logger/logger_test.go:51","message":"test messagekeyvalue"}
+--- PASS: TestLoggerJSONOutput (0.00s)
+=== RUN   TestLogLevels
+=== RUN   TestLogLevels/Debug
+2025-11-15T17:53:06.002-0500	[35mDEBUG[0m	logger/logger_test.go:92	debug message
+=== RUN   TestLogLevels/Info
+2025-11-15T17:53:06.002-0500	[34mINFO[0m	logger/logger_test.go:92	info message
+=== RUN   TestLogLevels/Warn
+2025-11-15T17:53:06.002-0500	[33mWARN[0m	logger/logger_test.go:92	warn message
+github.com/schedcu/reimplement/internal/logger.TestLogLevels.func1
+	/home/lcgerke/schedCU/reimplement/internal/logger/logger_test.go:92
+testing.tRunner
+	/usr/lib/go/src/testing/testing.go:1934
+=== RUN   TestLogLevels/Error
+2025-11-15T17:53:06.002-0500	[31mERROR[0m	logger/logger_test.go:92	error message
+github.com/schedcu/reimplement/internal/logger.TestLogLevels.func1
+	/home/lcgerke/schedCU/reimplement/internal/logger/logger_test.go:92
+testing.tRunner
+	/usr/lib/go/src/testing/testing.go:1934
+--- PASS: TestLogLevels (0.00s)
+    --- PASS: TestLogLevels/Debug (0.00s)
+    --- PASS: TestLogLevels/Info (0.00s)
+    --- PASS: TestLogLevels/Warn (0.00s)
+    --- PASS: TestLogLevels/Error (0.00s)
+=== RUN   TestWithRequestID
+--- PASS: TestWithRequestID (0.00s)
+=== RUN   TestExtractRequestIDEmptyContext
+--- PASS: TestExtractRequestIDEmptyContext (0.00s)
+=== RUN   TestWithCorrelationID
+--- PASS: TestWithCorrelationID (0.00s)
+=== RUN   TestExtractCorrelationIDEmptyContext
+--- PASS: TestExtractCorrelationIDEmptyContext (0.00s)
+=== RUN   TestWithRequestIDMultiple
+--- PASS: TestWithRequestIDMultiple (0.00s)
+=== RUN   TestLogRequest
+2025-11-15T17:53:06.002-0500	[34mINFO[0m	logger/logger.go:120	HTTP request processed	{"method": "GET", "path": "/api/schedules", "status": 200, "duration_ms": 45}
+--- PASS: TestLogRequest (0.00s)
+=== RUN   TestLogError
+2025-11-15T17:53:06.002-0500	[31mERROR[0m	logger/logger.go:145	Error occurred	{"error": "test error occurred", "operation": "test_operation", "status": 500}
+github.com/schedcu/reimplement/internal/logger.LogError
+	/home/lcgerke/schedCU/reimplement/internal/logger/logger.go:145
+github.com/schedcu/reimplement/internal/logger.TestLogError
+	/home/lcgerke/schedCU/reimplement/internal/logger/logger_test.go:186
+testing.tRunner
+	/usr/lib/go/src/testing/testing.go:1934
+--- PASS: TestLogError (0.00s)
+=== RUN   TestLogServiceCall
+2025-11-15T17:53:06.003-0500	[34mINFO[0m	logger/logger.go:166	Service call succeeded	{"service": "user-service", "operation": "GetUser", "duration_ms": 120}
+2025-11-15T17:53:06.003-0500	[31mERROR[0m	logger/logger.go:157	Service call failed	{"service": "user-service", "operation": "UpdateUser", "duration_ms": 500, "error": "service failed"}
+github.com/schedcu/reimplement/internal/logger.LogServiceCall
+	/home/lcgerke/schedCU/reimplement/internal/logger/logger.go:157
+github.com/schedcu/reimplement/internal/logger.TestLogServiceCall
+	/home/lcgerke/schedCU/reimplement/internal/logger/logger_test.go:204
+testing.tRunner
+	/usr/lib/go/src/testing/testing.go:1934
+--- PASS: TestLogServiceCall (0.00s)
+=== RUN   TestNewLoggerInvalidEnv
+--- PASS: TestNewLoggerInvalidEnv (0.00s)
+=== RUN   TestLoggerConcurrency
+{"level":"info","timestamp":"2025-11-15T17:53:06.003-0500","caller":"logger/logger_test.go:232","message":"message from goroutine 9"}
+{"level":"info","timestamp":"2025-11-15T17:53:06.003-0500","caller":"logger/logger_test.go:232","message":"message from goroutine 7"}
+{"level":"info","timestamp":"2025-11-15T17:53:06.003-0500","caller":"logger/logger_test.go:232","message":"message from goroutine 8"}
+{"level":"info","timestamp":"2025-11-15T17:53:06.003-0500","caller":"logger/logger_test.go:232","message":"message from goroutine 1"}
+{"level":"info","timestamp":"2025-11-15T17:53:06.003-0500","caller":"logger/logger_test.go:232","message":"message from goroutine 0"}
+{"level":"info","timestamp":"2025-11-15T17:53:06.003-0500","caller":"logger/logger_test.go:232","message":"message from goroutine 2"}
+{"level":"info","timestamp":"2025-11-15T17:53:06.003-0500","caller":"logger/logger_test.go:232","message":"message from goroutine 5"}
+{"level":"info","timestamp":"2025-11-15T17:53:06.003-0500","caller":"logger/logger_test.go:232","message":"message from goroutine 4"}
+{"level":"info","timestamp":"2025-11-15T17:53:06.003-0500","caller":"logger/logger_test.go:232","message":"message from goroutine 3"}
+{"level":"info","timestamp":"2025-11-15T17:53:06.003-0500","caller":"logger/logger_test.go:232","message":"message from goroutine 6"}
+--- PASS: TestLoggerConcurrency (0.00s)
+=== RUN   TestContextWithBothIDs
+--- PASS: TestContextWithBothIDs (0.00s)
+=== RUN   TestNewLoggerFromEnvVar
+--- PASS: TestNewLoggerFromEnvVar (0.00s)
+=== RUN   TestRequestIDMiddleware
+--- PASS: TestRequestIDMiddleware (0.00s)
+=== RUN   TestRequestIDMiddlewareGeneratesID
+--- PASS: TestRequestIDMiddlewareGeneratesID (0.00s)
+=== RUN   TestRequestIDMiddlewarePreservesExisting
+--- PASS: TestRequestIDMiddlewarePreservesExisting (0.00s)
+=== RUN   TestLoggingMiddleware
+2025-11-15T17:53:06.013-0500	[34mINFO[0m	logger/middleware.go:116	HTTP request processed	{"request_id": "", "method": "GET", "path": "/api/schedules", "status": 200, "duration_ms": 10}
+--- PASS: TestLoggingMiddleware (0.01s)
+=== RUN   TestLoggingMiddlewareStatus
+=== RUN   TestLoggingMiddlewareStatus/È
+2025-11-15T17:53:06.013-0500	[34mINFO[0m	logger/middleware.go:116	HTTP request processed	{"request_id": "", "method": "GET", "path": "/test", "status": 200, "duration_ms": 0}
+=== RUN   TestLoggingMiddlewareStatus/Ɣ
+2025-11-15T17:53:06.013-0500	[31mERROR[0m	logger/middleware.go:108	HTTP request processed	{"request_id": "", "method": "GET", "path": "/test", "status": 404, "duration_ms": 0}
+github.com/schedcu/reimplement/internal/logger.TestLoggingMiddlewareStatus.func1.TestLoggingMiddlewareStatus.func1.LoggingMiddleware.2.3
+	/home/lcgerke/schedCU/reimplement/internal/logger/middleware.go:108
+net/http.HandlerFunc.ServeHTTP
+	/usr/lib/go/src/net/http/server.go:2322
+github.com/schedcu/reimplement/internal/logger.TestLoggingMiddlewareStatus.func1
+	/home/lcgerke/schedCU/reimplement/internal/logger/middleware_test.go:150
+testing.tRunner
+	/usr/lib/go/src/testing/testing.go:1934
+=== RUN   TestLoggingMiddlewareStatus/Ǵ
+2025-11-15T17:53:06.013-0500	[31mERROR[0m	logger/middleware.go:108	HTTP request processed	{"request_id": "", "method": "GET", "path": "/test", "status": 500, "duration_ms": 0}
+github.com/schedcu/reimplement/internal/logger.TestLoggingMiddlewareStatus.func1.TestLoggingMiddlewareStatus.func1.LoggingMiddleware.2.3
+	/home/lcgerke/schedCU/reimplement/internal/logger/middleware.go:108
+net/http.HandlerFunc.ServeHTTP
+	/usr/lib/go/src/net/http/server.go:2322
+github.com/schedcu/reimplement/internal/logger.TestLoggingMiddlewareStatus.func1
+	/home/lcgerke/schedCU/reimplement/internal/logger/middleware_test.go:150
+testing.tRunner
+	/usr/lib/go/src/testing/testing.go:1934
+--- PASS: TestLoggingMiddlewareStatus (0.00s)
+    --- PASS: TestLoggingMiddlewareStatus/È (0.00s)
+    --- PASS: TestLoggingMiddlewareStatus/Ɣ (0.00s)
+    --- PASS: TestLoggingMiddlewareStatus/Ǵ (0.00s)
+=== RUN   TestChainedMiddleware
+2025-11-15T17:53:06.013-0500	[34mINFO[0m	logger/middleware.go:116	HTTP request processed	{"request_id": "36068318-6804-4117-bcf2-2faee56d1f54", "method": "GET", "path": "/test", "status": 200, "duration_ms": 0}
+--- PASS: TestChainedMiddleware (0.00s)
+=== RUN   TestMiddlewareWithContextDeadline
+--- PASS: TestMiddlewareWithContextDeadline (0.00s)
+=== RUN   TestRequestIDHeaderCaseInsensitive
+--- PASS: TestRequestIDHeaderCaseInsensitive (0.00s)
+PASS
+coverage: 86.1% of statements
+ok  	github.com/schedcu/reimplement/internal/logger	0.017s	coverage: 86.1% of statements
+=== RUN   TestNewMetricsRegistry
+--- PASS: TestNewMetricsRegistry (0.00s)
+=== RUN   TestRecordHTTPRequest
+--- PASS: TestRecordHTTPRequest (0.00s)
+=== RUN   TestRecordHTTPError
+--- PASS: TestRecordHTTPError (0.00s)
+=== RUN   TestRecordDatabaseQuery
+--- PASS: TestRecordDatabaseQuery (0.00s)
+=== RUN   TestRecordServiceOperation
+--- PASS: TestRecordServiceOperation (0.00s)
+=== RUN   TestRecordValidationError
+--- PASS: TestRecordValidationError (0.00s)
+=== RUN   TestIncrementDecrementActiveJobs
+--- PASS: TestIncrementDecrementActiveJobs (0.00s)
+=== RUN   TestSetQueueDepth
+--- PASS: TestSetQueueDepth (0.00s)
+=== RUN   TestSetDatabaseConnectionPoolSize
+--- PASS: TestSetDatabaseConnectionPoolSize (0.00s)
+=== RUN   TestHTTPMiddleware
+--- PASS: TestHTTPMiddleware (0.00s)
+=== RUN   TestHTTPMiddlewareErrorHandling
+=== RUN   TestHTTPMiddlewareErrorHandling/OK
+=== RUN   TestHTTPMiddlewareErrorHandling/Redirect
+=== RUN   TestHTTPMiddlewareErrorHandling/NotFound
+=== RUN   TestHTTPMiddlewareErrorHandling/ServerError
+--- PASS: TestHTTPMiddlewareErrorHandling (0.00s)
+    --- PASS: TestHTTPMiddlewareErrorHandling/OK (0.00s)
+    --- PASS: TestHTTPMiddlewareErrorHandling/Redirect (0.00s)
+    --- PASS: TestHTTPMiddlewareErrorHandling/NotFound (0.00s)
+    --- PASS: TestHTTPMiddlewareErrorHandling/ServerError (0.00s)
+=== RUN   TestMetricsPrometheusFormat
+--- PASS: TestMetricsPrometheusFormat (0.00s)
+=== RUN   TestConcurrentMetricRecording
+--- PASS: TestConcurrentMetricRecording (0.00s)
+=== RUN   TestStatusCodeLabel
+=== RUN   TestStatusCodeLabel/È
+=== RUN   TestStatusCodeLabel/É
+=== RUN   TestStatusCodeLabel/ī
+=== RUN   TestStatusCodeLabel/Ĭ
+=== RUN   TestStatusCodeLabel/ĭ
+=== RUN   TestStatusCodeLabel/Ə
+=== RUN   TestStatusCodeLabel/Ɛ
+=== RUN   TestStatusCodeLabel/Ɣ
+=== RUN   TestStatusCodeLabel/ǳ
+=== RUN   TestStatusCodeLabel/Ǵ
+=== RUN   TestStatusCodeLabel/Ƕ
+=== RUN   TestStatusCodeLabel/ɗ
+=== RUN   TestStatusCodeLabel/\x00
+=== RUN   TestStatusCodeLabel/c
+=== RUN   TestStatusCodeLabel/ɘ
+--- PASS: TestStatusCodeLabel (0.00s)
+    --- PASS: TestStatusCodeLabel/È (0.00s)
+    --- PASS: TestStatusCodeLabel/É (0.00s)
+    --- PASS: TestStatusCodeLabel/ī (0.00s)
+    --- PASS: TestStatusCodeLabel/Ĭ (0.00s)
+    --- PASS: TestStatusCodeLabel/ĭ (0.00s)
+    --- PASS: TestStatusCodeLabel/Ə (0.00s)
+    --- PASS: TestStatusCodeLabel/Ɛ (0.00s)
+    --- PASS: TestStatusCodeLabel/Ɣ (0.00s)
+    --- PASS: TestStatusCodeLabel/ǳ (0.00s)
+    --- PASS: TestStatusCodeLabel/Ǵ (0.00s)
+    --- PASS: TestStatusCodeLabel/Ƕ (0.00s)
+    --- PASS: TestStatusCodeLabel/ɗ (0.00s)
+    --- PASS: TestStatusCodeLabel/\x00 (0.00s)
+    --- PASS: TestStatusCodeLabel/c (0.00s)
+    --- PASS: TestStatusCodeLabel/ɘ (0.00s)
+=== RUN   TestResponseWriterStatusCapture
+--- PASS: TestResponseWriterStatusCapture (0.00s)
+=== RUN   TestMetricsWithZeroValues
+--- PASS: TestMetricsWithZeroValues (0.00s)
+=== RUN   TestMetricsIntegration
+--- PASS: TestMetricsIntegration (0.00s)
+=== RUN   TestMetricsWithLargeNumbers
+--- PASS: TestMetricsWithLargeNumbers (0.00s)
+=== RUN   TestMetricsOutputReadable
+--- PASS: TestMetricsOutputReadable (0.00s)
+PASS
+coverage: 97.4% of statements
+ok  	github.com/schedcu/reimplement/internal/metrics	0.008s	coverage: 97.4% of statements
+?   	github.com/schedcu/reimplement/internal/repository	[no test files]
+=== RUN   TestAssignmentMapperSuccessfulMapping
+--- PASS: TestAssignmentMapperSuccessfulMapping (0.00s)
+=== RUN   TestAssignmentMapperShiftInstanceNotFound
+--- PASS: TestAssignmentMapperShiftInstanceNotFound (0.00s)
+=== RUN   TestAssignmentMapperDeletedShiftInstance
+--- PASS: TestAssignmentMapperDeletedShiftInstance (0.00s)
+=== RUN   TestAssignmentMapperNilPersonID
+--- PASS: TestAssignmentMapperNilPersonID (0.00s)
+=== RUN   TestAssignmentMapperNilScheduleVersionID
+--- PASS: TestAssignmentMapperNilScheduleVersionID (0.00s)
+=== RUN   TestAssignmentMapperNilUserID
+--- PASS: TestAssignmentMapperNilUserID (0.00s)
+=== RUN   TestAssignmentMapperTimestampsSet
+--- PASS: TestAssignmentMapperTimestampsSet (0.00s)
+=== RUN   TestAssignmentMapperSourceSetToAmion
+--- PASS: TestAssignmentMapperSourceSetToAmion (0.00s)
+=== RUN   TestAssignmentMapperDateParsing
+--- PASS: TestAssignmentMapperDateParsing (0.00s)
+=== RUN   TestAssignmentMapperPreservesOriginalShiftType
+--- PASS: TestAssignmentMapperPreservesOriginalShiftType (0.00s)
+=== RUN   TestAssignmentMapperMultipleShifts
+--- PASS: TestAssignmentMapperMultipleShifts (0.00s)
+=== RUN   TestAssignmentMapperBatchProcessing
+--- PASS: TestAssignmentMapperBatchProcessing (0.00s)
+=== RUN   TestAssignmentMapperInvalidDateFormat
+=== RUN   TestAssignmentMapperInvalidDateFormat/invalid_2025/11/20
+=== RUN   TestAssignmentMapperInvalidDateFormat/invalid_11-20-2025
+=== RUN   TestAssignmentMapperInvalidDateFormat/invalid_invalid-date
+=== RUN   TestAssignmentMapperInvalidDateFormat/invalid_
+=== RUN   TestAssignmentMapperInvalidDateFormat/invalid_2025-13-01
+=== RUN   TestAssignmentMapperInvalidDateFormat/invalid_2025-02-30
+--- PASS: TestAssignmentMapperInvalidDateFormat (0.00s)
+    --- PASS: TestAssignmentMapperInvalidDateFormat/invalid_2025/11/20 (0.00s)
+    --- PASS: TestAssignmentMapperInvalidDateFormat/invalid_11-20-2025 (0.00s)
+    --- PASS: TestAssignmentMapperInvalidDateFormat/invalid_invalid-date (0.00s)
+    --- PASS: TestAssignmentMapperInvalidDateFormat/invalid_ (0.00s)
+    --- PASS: TestAssignmentMapperInvalidDateFormat/invalid_2025-13-01 (0.00s)
+    --- PASS: TestAssignmentMapperInvalidDateFormat/invalid_2025-02-30 (0.00s)
+=== RUN   TestAssignmentMapperIDGeneration
+--- PASS: TestAssignmentMapperIDGeneration (0.00s)
+=== RUN   TestAssignmentMapperValidation
+--- PASS: TestAssignmentMapperValidation (0.00s)
+=== RUN   TestAssignmentMapperScheduleVersionMismatch
+--- PASS: TestAssignmentMapperScheduleVersionMismatch (0.00s)
+=== RUN   TestNewAmionHTTPClient
+=== RUN   TestNewAmionHTTPClient/valid_base_URL
+=== RUN   TestNewAmionHTTPClient/invalid_URL_scheme
+=== RUN   TestNewAmionHTTPClient/empty_URL
+=== RUN   TestNewAmionHTTPClient/localhost_with_port
+--- PASS: TestNewAmionHTTPClient (0.00s)
+    --- PASS: TestNewAmionHTTPClient/valid_base_URL (0.00s)
+    --- PASS: TestNewAmionHTTPClient/invalid_URL_scheme (0.00s)
+    --- PASS: TestNewAmionHTTPClient/empty_URL (0.00s)
+    --- PASS: TestNewAmionHTTPClient/localhost_with_port (0.00s)
+=== RUN   TestFetchAndParseHTMLSuccess
+--- PASS: TestFetchAndParseHTMLSuccess (0.00s)
+=== RUN   TestFetchAndParseHTMLGzipCompression
+--- PASS: TestFetchAndParseHTMLGzipCompression (0.00s)
+=== RUN   TestFetchAndParseHTML404Error
+--- PASS: TestFetchAndParseHTML404Error (0.00s)
+=== RUN   TestFetchAndParseHTML500Error
+--- PASS: TestFetchAndParseHTML500Error (7.01s)
+=== RUN   TestFetchAndParseHTMLMalformedHTML
+--- PASS: TestFetchAndParseHTMLMalformedHTML (0.00s)
+=== RUN   TestRetryLogic
+--- PASS: TestRetryLogic (3.00s)
+=== RUN   TestRetryExhaustion
+--- PASS: TestRetryExhaustion (7.00s)
+=== RUN   TestContextCancellation
+--- PASS: TestContextCancellation (2.00s)
+=== RUN   TestCookieJarPersistence
+--- PASS: TestCookieJarPersistence (0.00s)
+=== RUN   TestUserAgent
+--- PASS: TestUserAgent (0.00s)
+=== RUN   TestConnectionPooling
+--- PASS: TestConnectionPooling (0.00s)
+=== RUN   TestConcurrentRequests
+--- PASS: TestConcurrentRequests (0.00s)
+=== RUN   TestRedirectHandling
+--- PASS: TestRedirectHandling (0.00s)
+=== RUN   TestMaxRedirects
+--- PASS: TestMaxRedirects (0.00s)
+=== RUN   TestInvalidHTMLURL
+--- PASS: TestInvalidHTMLURL (0.00s)
+=== RUN   TestEncodingDetection
+--- PASS: TestEncodingDetection (0.00s)
+=== RUN   TestNetworkTimeout
+2025/11/15 17:53:31 httptest.Server blocked in Close after 5 seconds, waiting for connections:
+  *net.TCPConn 0xc00018a070 127.0.0.1:39834 in state active
+--- PASS: TestNetworkTimeout (35.00s)
+=== RUN   TestConnectionRefused
+--- PASS: TestConnectionRefused (7.00s)
+=== RUN   TestWithLogger
+--- PASS: TestWithLogger (0.00s)
+=== RUN   TestResponseBodyReadError
+--- PASS: TestResponseBodyReadError (0.00s)
+=== RUN   TestHTTPErrorFields
+--- PASS: TestHTTPErrorFields (0.00s)
+=== RUN   TestGoroutinePoolMaxConcurrency
+--- PASS: TestGoroutinePoolMaxConcurrency (0.40s)
+=== RUN   TestGoroutinePoolBackpressure
+--- PASS: TestGoroutinePoolBackpressure (50.01s)
+=== RUN   TestGoroutinePoolQueueDepthLimit
+--- PASS: TestGoroutinePoolQueueDepthLimit (0.11s)
+=== RUN   TestGoroutinePoolJobExecution
+--- PASS: TestGoroutinePoolJobExecution (0.00s)
+=== RUN   TestGoroutinePoolErrorHandling
+--- PASS: TestGoroutinePoolErrorHandling (0.00s)
+=== RUN   TestGoroutinePoolContextCancellation
+--- PASS: TestGoroutinePoolContextCancellation (0.20s)
+=== RUN   TestGoroutinePoolClose
+--- PASS: TestGoroutinePoolClose (0.20s)
+=== RUN   TestGoroutinePoolStressTest
+--- PASS: TestGoroutinePoolStressTest (0.20s)
+=== RUN   TestGoroutinePoolIntegrationWithRateLimiter
+--- PASS: TestGoroutinePoolIntegrationWithRateLimiter (0.15s)
+=== RUN   TestNewAmionErrorCollector
+--- PASS: TestNewAmionErrorCollector (0.00s)
+=== RUN   TestAddError_MissingCell
+--- PASS: TestAddError_MissingCell (0.00s)
+=== RUN   TestAddError_Multiple
+--- PASS: TestAddError_Multiple (0.00s)
+=== RUN   TestAddError_InvalidValue
+--- PASS: TestAddError_InvalidValue (0.00s)
+=== RUN   TestAddError_MissingRow
+--- PASS: TestAddError_MissingRow (0.00s)
+=== RUN   TestAddError_InvalidHTML
+--- PASS: TestAddError_InvalidHTML (0.00s)
+=== RUN   TestAddError_EmptyTable
+--- PASS: TestAddError_EmptyTable (0.00s)
+=== RUN   TestAddError_EncodingError
+--- PASS: TestAddError_EncodingError (0.00s)
+=== RUN   TestGroupErrorsByType_SingleType
+--- PASS: TestGroupErrorsByType_SingleType (0.00s)
+=== RUN   TestGroupErrorsByType_MultipleTypes
+--- PASS: TestGroupErrorsByType_MultipleTypes (0.00s)
+=== RUN   TestErrorCount
+--- PASS: TestErrorCount (0.00s)
+=== RUN   TestHasErrors
+--- PASS: TestHasErrors (0.00s)
+=== RUN   TestToValidationResult_WithErrors
+--- PASS: TestToValidationResult_WithErrors (0.00s)
+=== RUN   TestToValidationResult_NoErrors
+--- PASS: TestToValidationResult_NoErrors (0.00s)
+=== RUN   TestErrorMessageFormat
+    error_collector_test.go:266: Error message format: Field="R5C3", Message="[MissingCell@R5C3] Expected shift date cell"
+--- PASS: TestErrorMessageFormat (0.00s)
+=== RUN   TestClear
+--- PASS: TestClear (0.00s)
+=== RUN   TestGetErrors
+--- PASS: TestGetErrors (0.00s)
+=== RUN   TestMultipleErrorsSameCell
+--- PASS: TestMultipleErrorsSameCell (0.00s)
+=== RUN   TestComplexErrorScenario
+--- PASS: TestComplexErrorScenario (0.00s)
+=== RUN   TestValidationResultContext
+--- PASS: TestValidationResultContext (0.00s)
+=== RUN   TestRateLimiterWaitEnforcesMinimumDelay
+--- PASS: TestRateLimiterWaitEnforcesMinimumDelay (1.00s)
+=== RUN   TestRateLimiterMultipleRequests
+--- PASS: TestRateLimiterMultipleRequests (4.00s)
+=== RUN   TestRateLimiterThreadSafety
+--- PASS: TestRateLimiterThreadSafety (0.30s)
+=== RUN   TestRateLimiterResetAfterWait
+--- PASS: TestRateLimiterResetAfterWait (0.00s)
+=== RUN   TestRateLimiterDifferentIntervals
+=== RUN   TestRateLimiterDifferentIntervals/100ms
+=== RUN   TestRateLimiterDifferentIntervals/500ms
+=== RUN   TestRateLimiterDifferentIntervals/1s
+--- PASS: TestRateLimiterDifferentIntervals (1.60s)
+    --- PASS: TestRateLimiterDifferentIntervals/100ms (0.10s)
+    --- PASS: TestRateLimiterDifferentIntervals/500ms (0.50s)
+    --- PASS: TestRateLimiterDifferentIntervals/1s (1.00s)
+=== RUN   TestScrapeSchedule_Valid6Months
+--- PASS: TestScrapeSchedule_Valid6Months (0.01s)
+=== RUN   TestScrapeSchedule_PartialFailure
+--- PASS: TestScrapeSchedule_PartialFailure (0.01s)
+=== RUN   TestScrapeSchedule_DuplicateDetection
+--- PASS: TestScrapeSchedule_DuplicateDetection (0.01s)
+=== RUN   TestScrapeSchedule_RateLimiting
+--- PASS: TestScrapeSchedule_RateLimiting (0.10s)
+=== RUN   TestScrapeSchedule_EmptyMonths
+--- PASS: TestScrapeSchedule_EmptyMonths (0.01s)
+=== RUN   TestGenerateMonthURLs
+=== RUN   TestGenerateMonthURLs/single_month
+=== RUN   TestGenerateMonthURLs/6_months_crossing_year_boundary
+=== RUN   TestGenerateMonthURLs/december_to_january
+--- PASS: TestGenerateMonthURLs (0.00s)
+    --- PASS: TestGenerateMonthURLs/single_month (0.00s)
+    --- PASS: TestGenerateMonthURLs/6_months_crossing_year_boundary (0.00s)
+    --- PASS: TestGenerateMonthURLs/december_to_january (0.00s)
+=== RUN   TestScrapeSchedule_InvalidMonthCount
+=== RUN   TestScrapeSchedule_InvalidMonthCount/zero_months
+=== RUN   TestScrapeSchedule_InvalidMonthCount/negative_months
+=== RUN   TestScrapeSchedule_InvalidMonthCount/one_month
+=== RUN   TestScrapeSchedule_InvalidMonthCount/12_months
+--- PASS: TestScrapeSchedule_InvalidMonthCount (0.47s)
+    --- PASS: TestScrapeSchedule_InvalidMonthCount/zero_months (0.00s)
+    --- PASS: TestScrapeSchedule_InvalidMonthCount/negative_months (0.00s)
+    --- PASS: TestScrapeSchedule_InvalidMonthCount/one_month (0.47s)
+    --- PASS: TestScrapeSchedule_InvalidMonthCount/12_months (0.00s)
+=== RUN   TestScrapeSchedule_ContextCancellation
+--- PASS: TestScrapeSchedule_ContextCancellation (0.00s)
+=== RUN   TestScrapedShifts_Helpers
+--- PASS: TestScrapedShifts_Helpers (0.00s)
+=== RUN   TestExtractShifts_SingleShift
+--- PASS: TestExtractShifts_SingleShift (0.00s)
+=== RUN   TestExtractShifts_MultipleShifts
+--- PASS: TestExtractShifts_MultipleShifts (0.00s)
+=== RUN   TestExtractShifts_WhitespaceHandling
+--- PASS: TestExtractShifts_WhitespaceHandling (0.00s)
+=== RUN   TestExtractShifts_SkipEmptyRows
+--- PASS: TestExtractShifts_SkipEmptyRows (0.00s)
+=== RUN   TestExtractShifts_SkipHeaderRows
+--- PASS: TestExtractShifts_SkipHeaderRows (0.00s)
+=== RUN   TestExtractShifts_MissingDate
+--- PASS: TestExtractShifts_MissingDate (0.00s)
+=== RUN   TestExtractShifts_MissingShiftType
+--- PASS: TestExtractShifts_MissingShiftType (0.00s)
+=== RUN   TestExtractShifts_MissingStartTime
+--- PASS: TestExtractShifts_MissingStartTime (0.00s)
+=== RUN   TestExtractShifts_MissingEndTime
+--- PASS: TestExtractShifts_MissingEndTime (0.00s)
+=== RUN   TestExtractShifts_MissingLocation
+--- PASS: TestExtractShifts_MissingLocation (0.00s)
+=== RUN   TestExtractShifts_InvalidStaffing
+--- PASS: TestExtractShifts_InvalidStaffing (0.00s)
+=== RUN   TestExtractShifts_ValidStaffing
+--- PASS: TestExtractShifts_ValidStaffing (0.00s)
+=== RUN   TestExtractShiftsForMonth
+--- PASS: TestExtractShiftsForMonth (0.00s)
+=== RUN   TestExtractShifts_EmptyTable
+--- PASS: TestExtractShifts_EmptyTable (0.00s)
+=== RUN   TestExtractShifts_NoTbodyElement
+--- PASS: TestExtractShifts_NoTbodyElement (0.00s)
+=== RUN   TestExtractShifts_CellReferences
+--- PASS: TestExtractShifts_CellReferences (0.00s)
+=== RUN   TestExtractShifts_MultipleErrors
+--- PASS: TestExtractShifts_MultipleErrors (0.00s)
+=== RUN   TestExtractShifts_FormattedErrors
+--- PASS: TestExtractShifts_FormattedErrors (0.00s)
+=== RUN   TestExtractShifts_LargeBatch
+--- PASS: TestExtractShifts_LargeBatch (0.00s)
+=== RUN   TestExtractShifts_CustomSelectors
+--- PASS: TestExtractShifts_CustomSelectors (0.00s)
+=== RUN   TestExtractShifts_VariousStaffingFormats
+--- PASS: TestExtractShifts_VariousStaffingFormats (0.00s)
+=== RUN   TestExtractShifts_RealAmionStructure
+--- PASS: TestExtractShifts_RealAmionStructure (0.00s)
+=== RUN   TestExtractionResult_HelperMethods
+--- PASS: TestExtractionResult_HelperMethods (0.00s)
+PASS
+coverage: 67.0% of statements
+ok  	github.com/schedcu/reimplement/internal/service/amion	119.834s	coverage: 67.0% of statements
+=== RUN   TestCoverageEmptyAssignments
+--- PASS: TestCoverageEmptyAssignments (0.00s)
+=== RUN   TestCoverageEmptyAssignmentsAllowsAllRequirements
+--- PASS: TestCoverageEmptyAssignmentsAllowsAllRequirements (0.00s)
+=== RUN   TestCoverageZeroRequirementShift
+--- PASS: TestCoverageZeroRequirementShift (0.00s)
+=== RUN   TestCoverageZeroRequirementWithZeroAssignments
+--- PASS: TestCoverageZeroRequirementWithZeroAssignments (0.00s)
+=== RUN   TestCoverageDuplicateAssignments
+--- PASS: TestCoverageDuplicateAssignments (0.00s)
+=== RUN   TestCoverageManyDuplicatesSameShift
+--- PASS: TestCoverageManyDuplicatesSameShift (0.00s)
+=== RUN   TestCoverageOverlappingShiftTimes
+--- PASS: TestCoverageOverlappingShiftTimes (0.00s)
+=== RUN   TestCoverageNilAssignmentsSlice
+--- PASS: TestCoverageNilAssignmentsSlice (0.00s)
+=== RUN   TestCoverageNilRequirementsMap
+--- PASS: TestCoverageNilRequirementsMap (0.00s)
+=== RUN   TestCoverageEmptyShiftType
+--- PASS: TestCoverageEmptyShiftType (0.00s)
+=== RUN   TestDataLoaderNilRepository
+--- PASS: TestDataLoaderNilRepository (0.00s)
+=== RUN   TestCoverageNilRequirementsStillWorks
+--- PASS: TestCoverageNilRequirementsStillWorks (0.00s)
+=== RUN   TestCoverageUnknownShiftType
+--- PASS: TestCoverageUnknownShiftType (0.00s)
+=== RUN   TestCoverageNegativeRequirement
+    algorithm_edge_cases_test.go:413: Negative requirement produced 0.00% coverage (algorithm handles gracefully)
+--- PASS: TestCoverageNegativeRequirement (0.00s)
+=== RUN   TestCoverageBoundaryZeroAssignments
+--- PASS: TestCoverageBoundaryZeroAssignments (0.00s)
+=== RUN   TestCoverageBoundaryOneAssignment
+--- PASS: TestCoverageBoundaryOneAssignment (0.00s)
+=== RUN   TestCoverageBoundaryOneShiftType
+--- PASS: TestCoverageBoundaryOneShiftType (0.00s)
+=== RUN   TestCoverageBoundaryLargeRequirement
+--- PASS: TestCoverageBoundaryLargeRequirement (0.00s)
+=== RUN   TestPropertyCoveragePercentageInRange
+=== RUN   TestPropertyCoveragePercentageInRange/empty
+=== RUN   TestPropertyCoveragePercentageInRange/partial_coverage
+=== RUN   TestPropertyCoveragePercentageInRange/over_coverage
+--- PASS: TestPropertyCoveragePercentageInRange (0.00s)
+    --- PASS: TestPropertyCoveragePercentageInRange/empty (0.00s)
+    --- PASS: TestPropertyCoveragePercentageInRange/partial_coverage (0.00s)
+    --- PASS: TestPropertyCoveragePercentageInRange/over_coverage (0.00s)
+=== RUN   TestPropertyMonotonicIncrease
+    algorithm_edge_cases_test.go:610: Monotonic increase verified: 0.00% -> 20.00% -> 40.00%
+--- PASS: TestPropertyMonotonicIncrease (0.00s)
+=== RUN   TestPropertyWeightedAverage
+    algorithm_edge_cases_test.go:650: Weighted average: 75.00% (expected 75.00%)
+--- PASS: TestPropertyWeightedAverage (0.00s)
+=== RUN   TestEdgeCasesSummary
+    algorithm_edge_cases_test.go:694: Summary: EDGE CASES TESTED:
+        1. Empty assignments: all shifts 0 percent coverage
+        2. Zero-requirement shifts: division by zero handled
+        3. Duplicate assignments: counted per algorithm design
+        4. Overlapping shift times: algorithm ignores time overlap
+        5. Null/missing data: nil handling verified
+        6. Nil assignments list: graceful handling
+        7. Nil requirements map: graceful handling
+        8. Empty shift type strings: handled correctly
+        9. Unknown shift types: documented behavior
+        10. Negative requirements: impossible case handled
+        
+        BOUNDARY TESTS:
+        1. Exactly 0 assignments
+        2. Exactly 1 assignment
+        3. Exactly 1 shift type
+        4. Shift with 0 requirement
+        5. Shift with 1000+ requirement
+        
+        PROPERTY-BASED TESTS:
+        1. Coverage always in valid range [0%, inf)
+        2. Coverage never negative or NaN
+        3. Adding assignments is monotonic (never decreases)
+        4. Overall coverage = weighted average of shift coverages
+        5. Multiple shift types combine correctly
+        
+        ERROR HANDLING VERIFIED:
+        1. Nil repository: ErrNilRepository error
+        2. Nil requirements: graceful fallback
+        3. Large datasets (1000+ shifts): handled efficiently
+        4. Overlapping times: algorithm-level, not enforced
+        5. Invalid data: non-panicking handling
+        
+        TOTAL TEST SCENARIOS: 20+
+--- PASS: TestEdgeCasesSummary (0.00s)
+=== RUN   TestNewCoverageAssertionHelper
+--- PASS: TestNewCoverageAssertionHelper (0.00s)
+=== RUN   TestAssertQueryCountPass
+--- PASS: TestAssertQueryCountPass (0.00s)
+=== RUN   TestAssertQueryCountFail
+--- PASS: TestAssertQueryCountFail (0.00s)
+=== RUN   TestAssertSingleQueryDataLoadPass
+--- PASS: TestAssertSingleQueryDataLoadPass (0.00s)
+=== RUN   TestAssertSingleQueryDataLoadFail
+--- PASS: TestAssertSingleQueryDataLoadFail (0.00s)
+=== RUN   TestAssertSingleQueryDataLoadZeroQueriesFail
+--- PASS: TestAssertSingleQueryDataLoadZeroQueriesFail (0.00s)
+=== RUN   TestAssertCoverageCalculationPass
+--- PASS: TestAssertCoverageCalculationPass (0.00s)
+=== RUN   TestAssertCoverageCalculationFail
+--- PASS: TestAssertCoverageCalculationFail (0.00s)
+=== RUN   TestAssertQueryCountLEPass
+--- PASS: TestAssertQueryCountLEPass (0.00s)
+=== RUN   TestAssertQueryCountLEFail
+--- PASS: TestAssertQueryCountLEFail (0.00s)
+=== RUN   TestAssertNoNPlusOnePass
+--- PASS: TestAssertNoNPlusOnePass (0.00s)
+=== RUN   TestAssertNoNPlusOneDetectsPattern
+--- PASS: TestAssertNoNPlusOneDetectsPattern (0.00s)
+=== RUN   TestAssertDataLoaderOperationSuccess
+--- PASS: TestAssertDataLoaderOperationSuccess (0.00s)
+=== RUN   TestAssertDataLoaderOperationAssertionFails
+--- PASS: TestAssertDataLoaderOperationAssertionFails (0.00s)
+=== RUN   TestAssertDataLoaderOperationOperationFails
+--- PASS: TestAssertDataLoaderOperationOperationFails (0.00s)
+=== RUN   TestAssertDataLoaderOperationWithContextSuccess
+--- PASS: TestAssertDataLoaderOperationWithContextSuccess (0.00s)
+=== RUN   TestAssertCoverageOperationTimingSuccess
+--- PASS: TestAssertCoverageOperationTimingSuccess (0.00s)
+=== RUN   TestAssertCoverageOperationTimingExceedsDuration
+--- PASS: TestAssertCoverageOperationTimingExceedsDuration (0.05s)
+=== RUN   TestLogAllQueries
+--- PASS: TestLogAllQueries (0.00s)
+=== RUN   TestGetExpectedQueryCount
+--- PASS: TestGetExpectedQueryCount (0.00s)
+=== RUN   TestAssertNoRegressionPass
+--- PASS: TestAssertNoRegressionPass (0.00s)
+=== RUN   TestAssertNoRegressionFail
+--- PASS: TestAssertNoRegressionFail (0.00s)
+=== RUN   TestDocumentExpectedQueries
+--- PASS: TestDocumentExpectedQueries (0.00s)
+=== RUN   TestAssertCoverageCalculationWithScheduleVersionValid
+--- PASS: TestAssertCoverageCalculationWithScheduleVersionValid (0.00s)
+=== RUN   TestAssertCoverageCalculationWithScheduleVersionNilID
+--- PASS: TestAssertCoverageCalculationWithScheduleVersionNilID (0.00s)
+=== RUN   TestFormatCoverageQueriesEmpty
+--- PASS: TestFormatCoverageQueriesEmpty (0.00s)
+=== RUN   TestFormatCoverageQueriesWithLongSQL
+--- PASS: TestFormatCoverageQueriesWithLongSQL (0.00s)
+=== RUN   TestFormatCoverageQueriesWithArgs
+--- PASS: TestFormatCoverageQueriesWithArgs (0.00s)
+=== RUN   TestFormatCoverageQueriesWithDuration
+--- PASS: TestFormatCoverageQueriesWithDuration (0.00s)
+=== RUN   TestFormatCoverageQueriesWithError
+--- PASS: TestFormatCoverageQueriesWithError (0.00s)
+=== RUN   TestMultipleOperationExpectations
+--- PASS: TestMultipleOperationExpectations (0.00s)
+=== RUN   TestAssertionErrorMessagesIncludeQueryDetails
+--- PASS: TestAssertionErrorMessagesIncludeQueryDetails (0.00s)
+=== RUN   TestCoverageDataLoaderEmpty
+--- PASS: TestCoverageDataLoaderEmpty (0.00s)
+=== RUN   TestCoverageDataLoaderSmall
+--- PASS: TestCoverageDataLoaderSmall (0.00s)
+=== RUN   TestCoverageDataLoaderLarge
+--- PASS: TestCoverageDataLoaderLarge (0.00s)
+=== RUN   TestCoverageDataLoaderQueryCount
+--- PASS: TestCoverageDataLoaderQueryCount (0.00s)
+=== RUN   TestCoverageDataLoaderDataCorrectness
+--- PASS: TestCoverageDataLoaderDataCorrectness (0.00s)
+=== RUN   TestCoverageDataLoaderFiltersByScheduleVersion
+--- PASS: TestCoverageDataLoaderFiltersByScheduleVersion (0.00s)
+=== RUN   TestCoverageDataLoaderRepositoryError
+--- PASS: TestCoverageDataLoaderRepositoryError (0.00s)
+=== RUN   TestCoverageDataLoaderNoCaching
+--- PASS: TestCoverageDataLoaderNoCaching (0.00s)
+=== RUN   TestCoverageDataLoaderContextCancellation
+--- PASS: TestCoverageDataLoaderContextCancellation (0.00s)
+=== RUN   TestCoverageDataLoaderPerformanceWithQueryTracking
+    data_loader_test.go:436: Performance: loaded 1000 assignments in 2.835µs (mock query count: 1)
+--- PASS: TestCoverageDataLoaderPerformanceWithQueryTracking (0.00s)
+=== RUN   TestCoverageDataLoaderIntegration
+--- PASS: TestCoverageDataLoaderIntegration (0.00s)
+=== RUN   TestCoverageDataLoaderWithQueryCounter
+    integration_example_test.go:92: Query count verified: 1 (as expected for batch query pattern)
+--- PASS: TestCoverageDataLoaderWithQueryCounter (0.00s)
+=== RUN   TestCoverageCalculationIntegration
+    integration_example_test.go:155: Coverage calculation complete:
+    integration_example_test.go:156:   Morning coverage: 66.67%
+    integration_example_test.go:157:   Night coverage: 150.00%
+    integration_example_test.go:158:   Afternoon coverage: 0.00%
+--- PASS: TestCoverageCalculationIntegration (0.00s)
+=== RUN   TestBatchQueryRegressionDetection
+    integration_example_test.go:191: Query count assertion passed: exactly 1 query
+--- PASS: TestBatchQueryRegressionDetection (0.00s)
+=== RUN   TestMultipleScheduleVersionsIsolation
+    integration_example_test.go:257: Multiple schedule versions: 2 queries (as expected)
+--- PASS: TestMultipleScheduleVersionsIsolation (0.00s)
+=== RUN   TestEmptyResultHandling
+    integration_example_test.go:279: Empty result returned as nil slice (correct)
+--- PASS: TestEmptyResultHandling (0.00s)
+PASS
+coverage: 93.5% of statements
+ok  	github.com/schedcu/reimplement/internal/service/coverage	0.057s	coverage: 66.67%
+=== RUN   TestNewODSErrorCollectorInitialization
+--- PASS: TestNewODSErrorCollectorInitialization (0.00s)
+=== RUN   TestAddMissingRequiredFieldError
+--- PASS: TestAddMissingRequiredFieldError (0.00s)
+=== RUN   TestAddInvalidValueError
+--- PASS: TestAddInvalidValueError (0.00s)
+=== RUN   TestMultipleErrorsDifferentTypes
+--- PASS: TestMultipleErrorsDifferentTypes (0.00s)
+=== RUN   TestAddWarning
+--- PASS: TestAddWarning (0.00s)
+=== RUN   TestGroupErrorsByType
+--- PASS: TestGroupErrorsByType (0.00s)
+=== RUN   TestGroupErrorsByRow
+--- PASS: TestGroupErrorsByRow (0.00s)
+=== RUN   TestToValidationResultEmpty
+--- PASS: TestToValidationResultEmpty (0.00s)
+=== RUN   TestToValidationResultWithErrors
+--- PASS: TestToValidationResultWithErrors (0.00s)
+=== RUN   TestMixedErrorsAndWarnings
+--- PASS: TestMixedErrorsAndWarnings (0.00s)
+=== RUN   TestLargeNumberOfErrors
+--- PASS: TestLargeNumberOfErrors (0.00s)
+=== RUN   TestNilErrorHandling
+--- PASS: TestNilErrorHandling (0.00s)
+=== RUN   TestErrorOrderPreservation
+--- PASS: TestErrorOrderPreservation (0.00s)
+=== RUN   TestParsingErrorString
+--- PASS: TestParsingErrorString (0.00s)
+=== RUN   TestODSImporter_ImportSuccess
+--- PASS: TestODSImporter_ImportSuccess (0.00s)
+=== RUN   TestODSImporter_PartialSuccess
+--- PASS: TestODSImporter_PartialSuccess (0.00s)
+=== RUN   TestODSImporter_DatabaseConstraintViolation
+--- PASS: TestODSImporter_DatabaseConstraintViolation (0.00s)
+=== RUN   TestODSImporter_FileNotFound
+--- PASS: TestODSImporter_FileNotFound (0.00s)
+=== RUN   TestODSImporter_MalformedODS
+--- PASS: TestODSImporter_MalformedODS (0.00s)
+=== RUN   TestODSImporter_ErrorCollectorIntegration
+--- PASS: TestODSImporter_ErrorCollectorIntegration (0.00s)
+=== RUN   TestODSImporter_EmptySchedule
+--- PASS: TestODSImporter_EmptySchedule (0.00s)
+=== RUN   TestODSImporter_ShiftDataMapping
+--- PASS: TestODSImporter_ShiftDataMapping (0.00s)
+=== RUN   TestODSImporter_InvalidHospitalID
+--- PASS: TestODSImporter_InvalidHospitalID (0.00s)
+=== RUN   TestMapToShiftInstanceValidInput
+--- PASS: TestMapToShiftInstanceValidInput (0.00s)
+=== RUN   TestMapToShiftInstanceInvalidDateFormat
+=== RUN   TestMapToShiftInstanceInvalidDateFormat/garbage_date
+=== RUN   TestMapToShiftInstanceInvalidDateFormat/partial_date
+=== RUN   TestMapToShiftInstanceInvalidDateFormat/empty_date
+=== RUN   TestMapToShiftInstanceInvalidDateFormat/wrong_date_format
+=== RUN   TestMapToShiftInstanceInvalidDateFormat/extra_spaces
+--- PASS: TestMapToShiftInstanceInvalidDateFormat (0.00s)
+    --- PASS: TestMapToShiftInstanceInvalidDateFormat/garbage_date (0.00s)
+    --- PASS: TestMapToShiftInstanceInvalidDateFormat/partial_date (0.00s)
+    --- PASS: TestMapToShiftInstanceInvalidDateFormat/empty_date (0.00s)
+    --- PASS: TestMapToShiftInstanceInvalidDateFormat/wrong_date_format (0.00s)
+    --- PASS: TestMapToShiftInstanceInvalidDateFormat/extra_spaces (0.00s)
+=== RUN   TestMapToShiftInstanceInvalidShiftType
+=== RUN   TestMapToShiftInstanceInvalidShiftType/lowercase_day
+=== RUN   TestMapToShiftInstanceInvalidShiftType/mixed_case
+=== RUN   TestMapToShiftInstanceInvalidShiftType/unknown_type
+=== RUN   TestMapToShiftInstanceInvalidShiftType/empty_shift_type
+=== RUN   TestMapToShiftInstanceInvalidShiftType/whitespace_only
+--- PASS: TestMapToShiftInstanceInvalidShiftType (0.00s)
+    --- PASS: TestMapToShiftInstanceInvalidShiftType/lowercase_day (0.00s)
+    --- PASS: TestMapToShiftInstanceInvalidShiftType/mixed_case (0.00s)
+    --- PASS: TestMapToShiftInstanceInvalidShiftType/unknown_type (0.00s)
+    --- PASS: TestMapToShiftInstanceInvalidShiftType/empty_shift_type (0.00s)
+    --- PASS: TestMapToShiftInstanceInvalidShiftType/whitespace_only (0.00s)
+=== RUN   TestMapToShiftInstanceValidShiftTypes
+=== RUN   TestMapToShiftInstanceValidShiftTypes/DAY
+=== RUN   TestMapToShiftInstanceValidShiftTypes/NIGHT
+=== RUN   TestMapToShiftInstanceValidShiftTypes/WEEKEND
+--- PASS: TestMapToShiftInstanceValidShiftTypes (0.00s)
+    --- PASS: TestMapToShiftInstanceValidShiftTypes/DAY (0.00s)
+    --- PASS: TestMapToShiftInstanceValidShiftTypes/NIGHT (0.00s)
+    --- PASS: TestMapToShiftInstanceValidShiftTypes/WEEKEND (0.00s)
+=== RUN   TestMapToShiftInstanceNegativeRequiredStaffing
+--- PASS: TestMapToShiftInstanceNegativeRequiredStaffing (0.00s)
+=== RUN   TestMapToShiftInstanceZeroRequiredStaffing
+--- PASS: TestMapToShiftInstanceZeroRequiredStaffing (0.00s)
+=== RUN   TestMapToShiftInstanceInvalidStaffingFormat
+=== RUN   TestMapToShiftInstanceInvalidStaffingFormat/text_value
+=== RUN   TestMapToShiftInstanceInvalidStaffingFormat/decimal_value
+=== RUN   TestMapToShiftInstanceInvalidStaffingFormat/empty_string
+=== RUN   TestMapToShiftInstanceInvalidStaffingFormat/whitespace_only
+--- PASS: TestMapToShiftInstanceInvalidStaffingFormat (0.00s)
+    --- PASS: TestMapToShiftInstanceInvalidStaffingFormat/text_value (0.00s)
+    --- PASS: TestMapToShiftInstanceInvalidStaffingFormat/decimal_value (0.00s)
+    --- PASS: TestMapToShiftInstanceInvalidStaffingFormat/empty_string (0.00s)
+    --- PASS: TestMapToShiftInstanceInvalidStaffingFormat/whitespace_only (0.00s)
+=== RUN   TestMapToShiftInstanceDateInPast
+--- PASS: TestMapToShiftInstanceDateInPast (0.00s)
+=== RUN   TestMapToShiftInstanceAllowPastDatesConfig
+--- PASS: TestMapToShiftInstanceAllowPastDatesConfig (0.00s)
+=== RUN   TestMapToShiftInstanceLeapYearDate
+--- PASS: TestMapToShiftInstanceLeapYearDate (0.00s)
+=== RUN   TestMapToShiftInstanceTimezoneHandling
+--- PASS: TestMapToShiftInstanceTimezoneHandling (0.00s)
+=== RUN   TestMapToShiftInstanceCreatedAtAndCreatedBy
+--- PASS: TestMapToShiftInstanceCreatedAtAndCreatedBy (0.00s)
+=== RUN   TestMapToShiftInstanceOptionalFieldsNil
+--- PASS: TestMapToShiftInstanceOptionalFieldsNil (0.00s)
+=== RUN   TestMapToShiftInstanceOptionalFieldsPreserved
+--- PASS: TestMapToShiftInstanceOptionalFieldsPreserved (0.00s)
+=== RUN   TestMapToShiftInstanceYearBoundary
+=== RUN   TestMapToShiftInstanceYearBoundary/year_start
+=== RUN   TestMapToShiftInstanceYearBoundary/year_end
+=== RUN   TestMapToShiftInstanceYearBoundary/decade_boundary
+--- PASS: TestMapToShiftInstanceYearBoundary (0.00s)
+    --- PASS: TestMapToShiftInstanceYearBoundary/year_start (0.00s)
+    --- PASS: TestMapToShiftInstanceYearBoundary/year_end (0.00s)
+    --- PASS: TestMapToShiftInstanceYearBoundary/decade_boundary (0.00s)
+=== RUN   TestMapToShiftInstanceRequiredStaffingConversion
+=== RUN   TestMapToShiftInstanceRequiredStaffingConversion/single_digit
+=== RUN   TestMapToShiftInstanceRequiredStaffingConversion/large_number
+=== RUN   TestMapToShiftInstanceRequiredStaffingConversion/one_staff
+--- PASS: TestMapToShiftInstanceRequiredStaffingConversion (0.00s)
+    --- PASS: TestMapToShiftInstanceRequiredStaffingConversion/single_digit (0.00s)
+    --- PASS: TestMapToShiftInstanceRequiredStaffingConversion/large_number (0.00s)
+    --- PASS: TestMapToShiftInstanceRequiredStaffingConversion/one_staff (0.00s)
+=== RUN   TestMapToShiftInstanceReturnsEntity
+--- PASS: TestMapToShiftInstanceReturnsEntity (0.00s)
+=== RUN   TestMapToShiftInstanceConsistency
+--- PASS: TestMapToShiftInstanceConsistency (0.00s)
+=== RUN   TestMapToShiftInstanceWhitespaceHandling
+--- PASS: TestMapToShiftInstanceWhitespaceHandling (0.00s)
+PASS
+coverage: 54.7% of statements
+ok  	github.com/schedcu/reimplement/internal/service/ods	0.007s	coverage: 54.7% of statements
+FAIL	github.com/schedcu/reimplement/internal/service/orchestrator [build failed]
+=== RUN   TestSeverityConstants
+=== RUN   TestSeverityConstants/ERROR_severity
+=== RUN   TestSeverityConstants/WARNING_severity
+=== RUN   TestSeverityConstants/INFO_severity
+--- PASS: TestSeverityConstants (0.00s)
+    --- PASS: TestSeverityConstants/ERROR_severity (0.00s)
+    --- PASS: TestSeverityConstants/WARNING_severity (0.00s)
+    --- PASS: TestSeverityConstants/INFO_severity (0.00s)
+=== RUN   TestSeverityString
+=== RUN   TestSeverityString/ERROR
+=== RUN   TestSeverityString/WARNING
+=== RUN   TestSeverityString/INFO
+--- PASS: TestSeverityString (0.00s)
+    --- PASS: TestSeverityString/ERROR (0.00s)
+    --- PASS: TestSeverityString/WARNING (0.00s)
+    --- PASS: TestSeverityString/INFO (0.00s)
+=== RUN   TestSeverityFromString
+=== RUN   TestSeverityFromString/Valid_ERROR
+=== RUN   TestSeverityFromString/Valid_WARNING
+=== RUN   TestSeverityFromString/Valid_INFO
+=== RUN   TestSeverityFromString/Uppercase_ERROR
+=== RUN   TestSeverityFromString/Mixed_case_Error
+=== RUN   TestSeverityFromString/Invalid_value
+=== RUN   TestSeverityFromString/Empty_string
+=== RUN   TestSeverityFromString/Uppercase_WARNING
+=== RUN   TestSeverityFromString/Lowercase_info
+=== RUN   TestSeverityFromString/Whitespace_before
+=== RUN   TestSeverityFromString/Whitespace_after
+=== RUN   TestSeverityFromString/Multiple_spaces
+=== RUN   TestSeverityFromString/Tab_characters
+=== RUN   TestSeverityFromString/All_lowercase_warning
+=== RUN   TestSeverityFromString/All_lowercase_info
+--- PASS: TestSeverityFromString (0.00s)
+    --- PASS: TestSeverityFromString/Valid_ERROR (0.00s)
+    --- PASS: TestSeverityFromString/Valid_WARNING (0.00s)
+    --- PASS: TestSeverityFromString/Valid_INFO (0.00s)
+    --- PASS: TestSeverityFromString/Uppercase_ERROR (0.00s)
+    --- PASS: TestSeverityFromString/Mixed_case_Error (0.00s)
+    --- PASS: TestSeverityFromString/Invalid_value (0.00s)
+    --- PASS: TestSeverityFromString/Empty_string (0.00s)
+    --- PASS: TestSeverityFromString/Uppercase_WARNING (0.00s)
+    --- PASS: TestSeverityFromString/Lowercase_info (0.00s)
+    --- PASS: TestSeverityFromString/Whitespace_before (0.00s)
+    --- PASS: TestSeverityFromString/Whitespace_after (0.00s)
+    --- PASS: TestSeverityFromString/Multiple_spaces (0.00s)
+    --- PASS: TestSeverityFromString/Tab_characters (0.00s)
+    --- PASS: TestSeverityFromString/All_lowercase_warning (0.00s)
+    --- PASS: TestSeverityFromString/All_lowercase_info (0.00s)
+=== RUN   TestMessageCodeConstants
+=== RUN   TestMessageCodeConstants/INVALID_FILE_FORMAT
+=== RUN   TestMessageCodeConstants/MISSING_REQUIRED_FIELD
+=== RUN   TestMessageCodeConstants/DUPLICATE_ENTRY
+=== RUN   TestMessageCodeConstants/PARSE_ERROR
+=== RUN   TestMessageCodeConstants/DATABASE_ERROR
+=== RUN   TestMessageCodeConstants/EXTERNAL_SERVICE_ERROR
+=== RUN   TestMessageCodeConstants/UNKNOWN_ERROR
+--- PASS: TestMessageCodeConstants (0.00s)
+    --- PASS: TestMessageCodeConstants/INVALID_FILE_FORMAT (0.00s)
+    --- PASS: TestMessageCodeConstants/MISSING_REQUIRED_FIELD (0.00s)
+    --- PASS: TestMessageCodeConstants/DUPLICATE_ENTRY (0.00s)
+    --- PASS: TestMessageCodeConstants/PARSE_ERROR (0.00s)
+    --- PASS: TestMessageCodeConstants/DATABASE_ERROR (0.00s)
+    --- PASS: TestMessageCodeConstants/EXTERNAL_SERVICE_ERROR (0.00s)
+    --- PASS: TestMessageCodeConstants/UNKNOWN_ERROR (0.00s)
+=== RUN   TestMessageCodeString
+=== RUN   TestMessageCodeString/INVALID_FILE_FORMAT
+=== RUN   TestMessageCodeString/MISSING_REQUIRED_FIELD
+=== RUN   TestMessageCodeString/DUPLICATE_ENTRY
+=== RUN   TestMessageCodeString/PARSE_ERROR
+=== RUN   TestMessageCodeString/DATABASE_ERROR
+=== RUN   TestMessageCodeString/EXTERNAL_SERVICE_ERROR
+=== RUN   TestMessageCodeString/UNKNOWN_ERROR
+--- PASS: TestMessageCodeString (0.00s)
+    --- PASS: TestMessageCodeString/INVALID_FILE_FORMAT (0.00s)
+    --- PASS: TestMessageCodeString/MISSING_REQUIRED_FIELD (0.00s)
+    --- PASS: TestMessageCodeString/DUPLICATE_ENTRY (0.00s)
+    --- PASS: TestMessageCodeString/PARSE_ERROR (0.00s)
+    --- PASS: TestMessageCodeString/DATABASE_ERROR (0.00s)
+    --- PASS: TestMessageCodeString/EXTERNAL_SERVICE_ERROR (0.00s)
+    --- PASS: TestMessageCodeString/UNKNOWN_ERROR (0.00s)
+=== RUN   TestMessageCodeFromString
+=== RUN   TestMessageCodeFromString/Valid_INVALID_FILE_FORMAT
+=== RUN   TestMessageCodeFromString/Valid_MISSING_REQUIRED_FIELD
+=== RUN   TestMessageCodeFromString/Valid_DUPLICATE_ENTRY
+=== RUN   TestMessageCodeFromString/Valid_PARSE_ERROR
+=== RUN   TestMessageCodeFromString/Valid_DATABASE_ERROR
+=== RUN   TestMessageCodeFromString/Valid_EXTERNAL_SERVICE_ERROR
+=== RUN   TestMessageCodeFromString/Valid_UNKNOWN_ERROR
+=== RUN   TestMessageCodeFromString/Invalid_code
+=== RUN   TestMessageCodeFromString/Empty_string
+=== RUN   TestMessageCodeFromString/Lowercase_invalid_file_format
+=== RUN   TestMessageCodeFromString/Mixed_case_parse_error
+=== RUN   TestMessageCodeFromString/Whitespace_before
+=== RUN   TestMessageCodeFromString/Whitespace_after
+=== RUN   TestMessageCodeFromString/Multiple_spaces
+=== RUN   TestMessageCodeFromString/All_lowercase_parse_error
+=== RUN   TestMessageCodeFromString/Mixed_case_PaRsE_eRrOr
+--- PASS: TestMessageCodeFromString (0.00s)
+    --- PASS: TestMessageCodeFromString/Valid_INVALID_FILE_FORMAT (0.00s)
+    --- PASS: TestMessageCodeFromString/Valid_MISSING_REQUIRED_FIELD (0.00s)
+    --- PASS: TestMessageCodeFromString/Valid_DUPLICATE_ENTRY (0.00s)
+    --- PASS: TestMessageCodeFromString/Valid_PARSE_ERROR (0.00s)
+    --- PASS: TestMessageCodeFromString/Valid_DATABASE_ERROR (0.00s)
+    --- PASS: TestMessageCodeFromString/Valid_EXTERNAL_SERVICE_ERROR (0.00s)
+    --- PASS: TestMessageCodeFromString/Valid_UNKNOWN_ERROR (0.00s)
+    --- PASS: TestMessageCodeFromString/Invalid_code (0.00s)
+    --- PASS: TestMessageCodeFromString/Empty_string (0.00s)
+    --- PASS: TestMessageCodeFromString/Lowercase_invalid_file_format (0.00s)
+    --- PASS: TestMessageCodeFromString/Mixed_case_parse_error (0.00s)
+    --- PASS: TestMessageCodeFromString/Whitespace_before (0.00s)
+    --- PASS: TestMessageCodeFromString/Whitespace_after (0.00s)
+    --- PASS: TestMessageCodeFromString/Multiple_spaces (0.00s)
+    --- PASS: TestMessageCodeFromString/All_lowercase_parse_error (0.00s)
+    --- PASS: TestMessageCodeFromString/Mixed_case_PaRsE_eRrOr (0.00s)
+=== RUN   TestValidationMessageCreation
+--- PASS: TestValidationMessageCreation (0.00s)
+=== RUN   TestValidationMessageWithoutField
+--- PASS: TestValidationMessageWithoutField (0.00s)
+=== RUN   TestValidationMessageWithEmptyDetails
+--- PASS: TestValidationMessageWithEmptyDetails (0.00s)
+=== RUN   TestValidationMessageMultipleCodesSeverities
+=== RUN   TestValidationMessageMultipleCodesSeverities/INVALID_FILE_FORMAT
+=== RUN   TestValidationMessageMultipleCodesSeverities/MISSING_REQUIRED_FIELD
+=== RUN   TestValidationMessageMultipleCodesSeverities/DUPLICATE_ENTRY
+=== RUN   TestValidationMessageMultipleCodesSeverities/PARSE_ERROR
+=== RUN   TestValidationMessageMultipleCodesSeverities/DATABASE_ERROR
+=== RUN   TestValidationMessageMultipleCodesSeverities/EXTERNAL_SERVICE_ERROR
+=== RUN   TestValidationMessageMultipleCodesSeverities/UNKNOWN_ERROR
+--- PASS: TestValidationMessageMultipleCodesSeverities (0.00s)
+    --- PASS: TestValidationMessageMultipleCodesSeverities/INVALID_FILE_FORMAT (0.00s)
+    --- PASS: TestValidationMessageMultipleCodesSeverities/MISSING_REQUIRED_FIELD (0.00s)
+    --- PASS: TestValidationMessageMultipleCodesSeverities/DUPLICATE_ENTRY (0.00s)
+    --- PASS: TestValidationMessageMultipleCodesSeverities/PARSE_ERROR (0.00s)
+    --- PASS: TestValidationMessageMultipleCodesSeverities/DATABASE_ERROR (0.00s)
+    --- PASS: TestValidationMessageMultipleCodesSeverities/EXTERNAL_SERVICE_ERROR (0.00s)
+    --- PASS: TestValidationMessageMultipleCodesSeverities/UNKNOWN_ERROR (0.00s)
+=== RUN   TestValidationMessageDetailsAreIndependent
+--- PASS: TestValidationMessageDetailsAreIndependent (0.00s)
+=== RUN   TestValidationMessageWithAllDetails
+--- PASS: TestValidationMessageWithAllDetails (0.00s)
+=== RUN   TestValidationMessageTimestamp
+--- PASS: TestValidationMessageTimestamp (0.00s)
+=== RUN   TestValidationMessageFieldOptional
+--- PASS: TestValidationMessageFieldOptional (0.00s)
+=== RUN   TestValidationMessageDetailsOptional
+--- PASS: TestValidationMessageDetailsOptional (0.00s)
+=== RUN   TestAllSeverityValues
+--- PASS: TestAllSeverityValues (0.00s)
+=== RUN   TestAllMessageCodeValues
+--- PASS: TestAllMessageCodeValues (0.00s)
+=== RUN   TestValidationMessageJSONTags
+--- PASS: TestValidationMessageJSONTags (0.00s)
+=== RUN   TestEmptyValidationResult
+--- PASS: TestEmptyValidationResult (0.00s)
+=== RUN   TestAddError
+--- PASS: TestAddError (0.00s)
+=== RUN   TestAddWarning
+--- PASS: TestAddWarning (0.00s)
+=== RUN   TestAddInfo
+--- PASS: TestAddInfo (0.00s)
+=== RUN   TestMixedMessages
+--- PASS: TestMixedMessages (0.00s)
+=== RUN   TestContextStorage
+--- PASS: TestContextStorage (0.00s)
+=== RUN   TestContextOverwrite
+--- PASS: TestContextOverwrite (0.00s)
+=== RUN   TestValidationMessageStructure
+--- PASS: TestValidationMessageStructure (0.00s)
+=== RUN   TestIsValidWithOnlyWarningsAndInfos
+--- PASS: TestIsValidWithOnlyWarningsAndInfos (0.00s)
+=== RUN   TestMultipleAddCallsPreserveOrder
+--- PASS: TestMultipleAddCallsPreserveOrder (0.00s)
+=== RUN   TestZeroValueValidationResult
+--- PASS: TestZeroValueValidationResult (0.00s)
+=== RUN   TestConcurrentSafeAdditions
+--- PASS: TestConcurrentSafeAdditions (0.00s)
+=== RUN   TestRoundTripEmptyValidationResult
+--- PASS: TestRoundTripEmptyValidationResult (0.00s)
+=== RUN   TestRoundTripWithErrors
+--- PASS: TestRoundTripWithErrors (0.00s)
+=== RUN   TestRoundTripWithWarnings
+--- PASS: TestRoundTripWithWarnings (0.00s)
+=== RUN   TestRoundTripWithInfos
+--- PASS: TestRoundTripWithInfos (0.00s)
+=== RUN   TestRoundTripMixedMessages
+--- PASS: TestRoundTripMixedMessages (0.00s)
+=== RUN   TestRoundTripWithContext
+--- PASS: TestRoundTripWithContext (0.00s)
+=== RUN   TestRoundTripComplexContext
+--- PASS: TestRoundTripComplexContext (0.00s)
+=== RUN   TestRoundTripWithAllMessageTypes
+--- PASS: TestRoundTripWithAllMessageTypes (0.00s)
+=== RUN   TestMarshaledJSONStructure
+--- PASS: TestMarshaledJSONStructure (0.00s)
+=== RUN   TestValidationMessageMarshaling
+--- PASS: TestValidationMessageMarshaling (0.00s)
+=== RUN   TestUnmarshalInvalidJSON
+--- PASS: TestUnmarshalInvalidJSON (0.00s)
+=== RUN   TestUnmarshalMissingFields
+--- PASS: TestUnmarshalMissingFields (0.00s)
+=== RUN   TestUnmarshalEmptyArrays
+--- PASS: TestUnmarshalEmptyArrays (0.00s)
+=== RUN   TestUnmarshalWrongArrayType
+--- PASS: TestUnmarshalWrongArrayType (0.00s)
+=== RUN   TestUnmarshalWrongContextType
+--- PASS: TestUnmarshalWrongContextType (0.00s)
+=== RUN   TestUnmarshalWithMissingOptionalFields
+--- PASS: TestUnmarshalWithMissingOptionalFields (0.00s)
+=== RUN   TestEmptyFieldAndMessage
+--- PASS: TestEmptyFieldAndMessage (0.00s)
+=== RUN   TestSpecialCharactersInMessages
+--- PASS: TestSpecialCharactersInMessages (0.00s)
+=== RUN   TestLargeNumberOfMessages
+--- PASS: TestLargeNumberOfMessages (0.00s)
+=== RUN   TestNullValuesInContext
+--- PASS: TestNullValuesInContext (0.00s)
+=== RUN   TestDuplicateMessagesPreserved
+--- PASS: TestDuplicateMessagesPreserved (0.00s)
+=== RUN   TestMessageOrderPreserved
+--- PASS: TestMessageOrderPreserved (0.00s)
+=== RUN   TestIndentedJSONFormatting
+--- PASS: TestIndentedJSONFormatting (0.00s)
+=== RUN   TestLoadFixtureEmpty
+--- PASS: TestLoadFixtureEmpty (0.00s)
+=== RUN   TestLoadFixtureSimple
+--- PASS: TestLoadFixtureSimple (0.00s)
+=== RUN   TestLoadFixtureComplex
+--- PASS: TestLoadFixtureComplex (0.00s)
+=== RUN   TestRoundTripFixtureSimple
+--- PASS: TestRoundTripFixtureSimple (0.00s)
+=== RUN   TestRoundTripFixtureComplex
+--- PASS: TestRoundTripFixtureComplex (0.00s)
+=== RUN   TestFixtureDirectoryExists
+--- PASS: TestFixtureDirectoryExists (0.00s)
+=== RUN   TestAllFixturesAreValidJSON
+--- PASS: TestAllFixturesAreValidJSON (0.00s)
+PASS
+coverage: 100.0% of statements
+ok  	github.com/schedcu/reimplement/internal/validation	0.008s	coverage: 100.0% of statements
+=== RUN   TestFixtureMetadata
+    ods_fixtures_test.go:52: Verified 4 fixtures in metadata
+--- PASS: TestFixtureMetadata (0.00s)
+=== RUN   TestFixtureFilesExist
+    ods_fixtures_test.go:75: Fixture valid_schedule.ods: 3811 bytes
+    ods_fixtures_test.go:75: Fixture partial_schedule.ods: 2716 bytes
+    ods_fixtures_test.go:75: Fixture invalid_schedule.ods: 2536 bytes
+    ods_fixtures_test.go:75: Fixture large_schedule.ods: 14025 bytes
+--- PASS: TestFixtureFilesExist (0.00s)
+=== RUN   TestFixturesAreValidZIP
+=== RUN   TestFixturesAreValidZIP/valid_schedule.ods
+    ods_fixtures_test.go:117: valid_schedule.ods: Valid ODS structure with 5 files
+=== RUN   TestFixturesAreValidZIP/partial_schedule.ods
+    ods_fixtures_test.go:117: partial_schedule.ods: Valid ODS structure with 5 files
+=== RUN   TestFixturesAreValidZIP/invalid_schedule.ods
+    ods_fixtures_test.go:117: invalid_schedule.ods: Valid ODS structure with 5 files
+=== RUN   TestFixturesAreValidZIP/large_schedule.ods
+    ods_fixtures_test.go:117: large_schedule.ods: Valid ODS structure with 5 files
+--- PASS: TestFixturesAreValidZIP (0.00s)
+    --- PASS: TestFixturesAreValidZIP/valid_schedule.ods (0.00s)
+    --- PASS: TestFixturesAreValidZIP/partial_schedule.ods (0.00s)
+    --- PASS: TestFixturesAreValidZIP/invalid_schedule.ods (0.00s)
+    --- PASS: TestFixturesAreValidZIP/large_schedule.ods (0.00s)
+=== RUN   TestFixtureMimetypeCorrect
+=== RUN   TestFixtureMimetypeCorrect/valid_schedule.ods
+    ods_fixtures_test.go:170: MIME type correct: application/vnd.oasis.opendocument.spreadsheet
+=== RUN   TestFixtureMimetypeCorrect/partial_schedule.ods
+    ods_fixtures_test.go:170: MIME type correct: application/vnd.oasis.opendocument.spreadsheet
+=== RUN   TestFixtureMimetypeCorrect/invalid_schedule.ods
+    ods_fixtures_test.go:170: MIME type correct: application/vnd.oasis.opendocument.spreadsheet
+=== RUN   TestFixtureMimetypeCorrect/large_schedule.ods
+    ods_fixtures_test.go:170: MIME type correct: application/vnd.oasis.opendocument.spreadsheet
+--- PASS: TestFixtureMimetypeCorrect (0.00s)
+    --- PASS: TestFixtureMimetypeCorrect/valid_schedule.ods (0.00s)
+    --- PASS: TestFixtureMimetypeCorrect/partial_schedule.ods (0.00s)
+    --- PASS: TestFixtureMimetypeCorrect/invalid_schedule.ods (0.00s)
+    --- PASS: TestFixtureMimetypeCorrect/large_schedule.ods (0.00s)
+=== RUN   TestFixtureContentXMLValid
+=== RUN   TestFixtureContentXMLValid/valid_schedule.ods
+    ods_fixtures_test.go:220: content.xml is valid XML (starts with "<?xml")
+=== RUN   TestFixtureContentXMLValid/partial_schedule.ods
+    ods_fixtures_test.go:220: content.xml is valid XML (starts with "<?xml")
+=== RUN   TestFixtureContentXMLValid/invalid_schedule.ods
+    ods_fixtures_test.go:220: content.xml is valid XML (starts with "<?xml")
+=== RUN   TestFixtureContentXMLValid/large_schedule.ods
+    ods_fixtures_test.go:220: content.xml is valid XML (starts with "<?xml")
+--- PASS: TestFixtureContentXMLValid (0.00s)
+    --- PASS: TestFixtureContentXMLValid/valid_schedule.ods (0.00s)
+    --- PASS: TestFixtureContentXMLValid/partial_schedule.ods (0.00s)
+    --- PASS: TestFixtureContentXMLValid/invalid_schedule.ods (0.00s)
+    --- PASS: TestFixtureContentXMLValid/large_schedule.ods (0.00s)
+=== RUN   TestFixtureSizeReasonable
+    ods_fixtures_test.go:250: valid_schedule.ods: 3811 bytes (expected 1000-10000)
+    ods_fixtures_test.go:250: partial_schedule.ods: 2716 bytes (expected 1000-10000)
+    ods_fixtures_test.go:250: invalid_schedule.ods: 2536 bytes (expected 1000-10000)
+    ods_fixtures_test.go:250: large_schedule.ods: 14025 bytes (expected 10000-1000000)
+--- PASS: TestFixtureSizeReasonable (0.00s)
+=== RUN   TestFixtureDataCoverage
+=== RUN   TestFixtureDataCoverage/valid_schedule
+    ods_fixtures_test.go:303: valid_schedule.ods: content.xml 104583 bytes (expected >= 7500)
+=== RUN   TestFixtureDataCoverage/partial_schedule
+    ods_fixtures_test.go:303: partial_schedule.ods: content.xml 30146 bytes (expected >= 2000)
+=== RUN   TestFixtureDataCoverage/invalid_schedule
+    ods_fixtures_test.go:303: invalid_schedule.ods: content.xml 20436 bytes (expected >= 1500)
+=== RUN   TestFixtureDataCoverage/large_schedule
+    ods_fixtures_test.go:303: large_schedule.ods: content.xml 819843 bytes (expected >= 50000)
+--- PASS: TestFixtureDataCoverage (0.00s)
+    --- PASS: TestFixtureDataCoverage/valid_schedule (0.00s)
+    --- PASS: TestFixtureDataCoverage/partial_schedule (0.00s)
+    --- PASS: TestFixtureDataCoverage/invalid_schedule (0.00s)
+    --- PASS: TestFixtureDataCoverage/large_schedule (0.00s)
+=== RUN   TestFixtureStructureConsistency
+=== RUN   TestFixtureStructureConsistency/valid_schedule.ods
+    ods_fixtures_test.go:356: valid_schedule.ods: Structure consistent
+=== RUN   TestFixtureStructureConsistency/partial_schedule.ods
+    ods_fixtures_test.go:356: partial_schedule.ods: Structure consistent
+=== RUN   TestFixtureStructureConsistency/invalid_schedule.ods
+    ods_fixtures_test.go:356: invalid_schedule.ods: Structure consistent
+=== RUN   TestFixtureStructureConsistency/large_schedule.ods
+    ods_fixtures_test.go:356: large_schedule.ods: Structure consistent
+--- PASS: TestFixtureStructureConsistency (0.00s)
+    --- PASS: TestFixtureStructureConsistency/valid_schedule.ods (0.00s)
+    --- PASS: TestFixtureStructureConsistency/partial_schedule.ods (0.00s)
+    --- PASS: TestFixtureStructureConsistency/invalid_schedule.ods (0.00s)
+    --- PASS: TestFixtureStructureConsistency/large_schedule.ods (0.00s)
+=== RUN   TestReadmeExists
+    ods_fixtures_test.go:373: README.md present: 8350 bytes
+--- PASS: TestReadmeExists (0.00s)
+PASS
+coverage: [no statements]
+ok  	github.com/schedcu/reimplement/tests/fixtures/ods	0.005s	coverage: [no statements]
+=== RUN   TestPostgresContainerConfig
+--- PASS: TestPostgresContainerConfig (0.00s)
+=== RUN   TestMySQLContainerConfig
+--- PASS: TestMySQLContainerConfig (0.00s)
+=== RUN   TestConnectionStringPostgres
+--- PASS: TestConnectionStringPostgres (0.00s)
+=== RUN   TestConnectionStringMySQL
+--- PASS: TestConnectionStringMySQL (0.00s)
+=== RUN   TestDatabaseContainerConfig
+--- PASS: TestDatabaseContainerConfig (0.00s)
+=== RUN   TestSetupOptionsDefaults
+--- PASS: TestSetupOptionsDefaults (0.00s)
+=== RUN   TestTestDatabaseSetupClose
+--- PASS: TestTestDatabaseSetupClose (0.00s)
+=== RUN   TestMockQueryCounterWithDatabase
+--- PASS: TestMockQueryCounterWithDatabase (0.00s)
+=== RUN   TestQueryCounterWithNPlusOneDetection
+--- PASS: TestQueryCounterWithNPlusOneDetection (0.00s)
+=== RUN   TestQueryCounterErrorMessageQuality
+--- PASS: TestQueryCounterErrorMessageQuality (0.00s)
+=== RUN   TestLogQueriesOutput
+--- PASS: TestLogQueriesOutput (0.00s)
+=== RUN   TestQueryCounterMultipleTestCycles
+--- PASS: TestQueryCounterMultipleTestCycles (0.00s)
+=== RUN   TestQueryCounterWithTimeout
+--- PASS: TestQueryCounterWithTimeout (0.00s)
+=== RUN   TestStartQueryCount
+--- PASS: TestStartQueryCount (0.00s)
+=== RUN   TestGetQueryCount
+--- PASS: TestGetQueryCount (0.00s)
+=== RUN   TestGetQueries
+--- PASS: TestGetQueries (0.00s)
+=== RUN   TestResetQueryCount
+--- PASS: TestResetQueryCount (0.00s)
+=== RUN   TestAppendQueryRecordsMetadata
+--- PASS: TestAppendQueryRecordsMetadata (0.00s)
+=== RUN   TestAssertQueryCount
+--- PASS: TestAssertQueryCount (0.00s)
+=== RUN   TestAssertQueryCountMismatch
+--- PASS: TestAssertQueryCountMismatch (0.00s)
+=== RUN   TestAssertQueryCountLEPass
+--- PASS: TestAssertQueryCountLEPass (0.00s)
+=== RUN   TestAssertQueryCountLEFail
+--- PASS: TestAssertQueryCountLEFail (0.00s)
+=== RUN   TestAssertNoNPlusOnePass
+--- PASS: TestAssertNoNPlusOnePass (0.00s)
+=== RUN   TestAssertNoNPlusOneDetectsPattern
+--- PASS: TestAssertNoNPlusOneDetectsPattern (0.00s)
+=== RUN   TestLogQueries
+--- PASS: TestLogQueries (0.00s)
+=== RUN   TestQueryCounterInactive
+--- PASS: TestQueryCounterInactive (0.00s)
+=== RUN   TestQueryCounterConcurrency
+--- PASS: TestQueryCounterConcurrency (0.00s)
+=== RUN   TestQueryRecordTimestamp
+--- PASS: TestQueryRecordTimestamp (0.01s)
+=== RUN   TestQueryRecordError
+--- PASS: TestQueryRecordError (0.00s)
+=== RUN   TestGetQueriesCopyPreventsModification
+--- PASS: TestGetQueriesCopyPreventsModification (0.00s)
+=== RUN   TestAssertQueryCountDetailedError
+--- PASS: TestAssertQueryCountDetailedError (0.00s)
+=== RUN   TestEmptyQueryLog
+--- PASS: TestEmptyQueryLog (0.00s)
+=== RUN   TestQueryCounterMultipleStartStopCycles
+--- PASS: TestQueryCounterMultipleStartStopCycles (0.00s)
+=== RUN   TestQueryArgsConversion
+--- PASS: TestQueryArgsConversion (0.00s)
+=== RUN   TestLongQueryTruncation
+--- PASS: TestLongQueryTruncation (0.00s)
+PASS
+coverage: 54.7% of statements
+ok  	github.com/schedcu/reimplement/tests/helpers	0.015s	coverage: 54.7% of statements
+FAIL

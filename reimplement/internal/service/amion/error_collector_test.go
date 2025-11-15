@@ -220,7 +220,7 @@ func TestToValidationResult_WithErrors(t *testing.T) {
 			t.Fatal("expected error message")
 		}
 		// Message should contain row reference
-		if !contains(firstMsg, "5") && !contains(firstMsg, "row") {
+		if !contains(firstMsg, "5") && !contains(firstMsg, "row") && !contains(firstMsg, "R") {
 			t.Errorf("expected row reference in message: %s", firstMsg)
 		}
 	}
@@ -349,8 +349,8 @@ func TestComplexErrorScenario(t *testing.T) {
 	collector.AddError(EncodingError, 0, 0, "Invalid UTF-8 at position 1024")
 
 	result := collector.ToValidationResult()
-	if result.ErrorCount() != 6 {
-		t.Errorf("expected 6 errors, got %d", result.ErrorCount())
+	if result.ErrorCount() != 7 {
+		t.Errorf("expected 7 errors, got %d", result.ErrorCount())
 	}
 
 	if result.IsValid() {

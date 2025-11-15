@@ -660,13 +660,14 @@ func TestExtractShifts_MultipleErrors(t *testing.T) {
 		t.Errorf("Expected 1 valid shift, got %d", result.ShiftCount())
 	}
 
-	// First row has 3 missing critical fields (date, shift type, end time) and 1 invalid staffing
-	if result.ErrorCount() != 4 {
-		t.Errorf("Expected 4 errors, got %d", result.ErrorCount())
+	// First row has 2 missing critical fields (date, shift type) and 1 invalid staffing
+	// (end_time is present in the HTML)
+	if result.ErrorCount() != 3 {
+		t.Errorf("Expected 3 errors, got %d", result.ErrorCount())
 	}
 
-	if result.CriticalErrorCount() != 3 {
-		t.Errorf("Expected 3 critical errors, got %d", result.CriticalErrorCount())
+	if result.CriticalErrorCount() != 2 {
+		t.Errorf("Expected 2 critical errors, got %d", result.CriticalErrorCount())
 	}
 }
 

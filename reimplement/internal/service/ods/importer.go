@@ -21,18 +21,16 @@ import (
 //	if err != nil {
 //	    log.Printf("Import failed: %v", err)
 //	    result := importer.GetValidationResult()
-//	    // handle partial import with result.Errors
 //	}
 type ODSImporter struct {
-	parser            ODSParserInterface
-	svRepository      repository.ScheduleVersionRepository
-	siRepository      repository.ShiftInstanceRepository
-	errorCollector    *ODSErrorCollector
+	parser               ODSParserInterface
+	svRepository         repository.ScheduleVersionRepository
+	siRepository         repository.ShiftInstanceRepository
+	errorCollector       *ODSErrorCollector
 	lastValidationResult *validation.ValidationResult
 }
 
 // NewODSImporter creates a new ODS importer with the given dependencies.
-// All parameters are required and must be non-nil.
 func NewODSImporter(
 	parser ODSParserInterface,
 	svRepository repository.ScheduleVersionRepository,
@@ -62,8 +60,6 @@ func NewODSImporter(
 // - On success: ScheduleVersion and nil error (all shifts imported)
 // - On partial success: ScheduleVersion and non-nil error (some shifts failed)
 // - On critical failure: nil ScheduleVersion and error (schedule version creation failed)
-//
-// The ValidationResult is always available via GetValidationResult() regardless of error.
 func (oi *ODSImporter) Import(
 	ctx context.Context,
 	odsContent []byte,
@@ -140,7 +136,6 @@ func (oi *ODSImporter) Import(
 	importHadErrors := false
 	for idx, parsedShift := range parsedSchedule.Shifts {
 		if ctx.Err() != nil {
-			// Context cancelled, stop import
 			break
 		}
 
@@ -156,7 +151,7 @@ func (oi *ODSImporter) Import(
 			importHadErrors = true
 			oi.errorCollector.AddMajor(
 				"shift",
-				fmt.Sprintf("%s_%s", shift.ShiftType, idx),
+				fmt.Sprintf("%s_%d", shift.ShiftType, idx),
 				"database",
 				fmt.Sprintf("failed to create shift: %s", shiftErr.Error()),
 				shiftErr,
@@ -240,8 +235,7 @@ func (oi *ODSImporter) createShiftInstanceFromParsed(
 }
 
 // BatchImport imports multiple ODS files for the same hospital.
-// Returns a map of file identifiers to import results (either ScheduleVersion or error).
-// This is useful for bulk operations.
+// Returns a map of file identifiers to import results.
 func (oi *ODSImporter) BatchImport(
 	ctx context.Context,
 	files map[string][]byte, // filename -> content
@@ -263,7 +257,6 @@ func (oi *ODSImporter) BatchImport(
 }
 
 // GetErrorMetrics returns a summary of errors from the last import.
-// Useful for reporting and monitoring.
 func (oi *ODSImporter) GetErrorMetrics() map[string]interface{} {
 	ec := oi.errorCollector
 	if ec == nil {
