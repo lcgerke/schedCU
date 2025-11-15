@@ -8,8 +8,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 
-	"schedcu/v2/internal/entity"
-	"schedcu/v2/internal/repository"
+	"github.com/schedcu/v2/internal/entity"
+	"github.com/schedcu/v2/internal/repository"
 )
 
 // PersonRepository implements repository.PersonRepository for PostgreSQL
@@ -169,11 +169,11 @@ func (r *PersonRepository) Update(ctx context.Context, person *entity.Person) er
 func (r *PersonRepository) Delete(ctx context.Context, id uuid.UUID, deleterID uuid.UUID) error {
 	query := `
 		UPDATE persons
-		SET deleted_at = NOW(), deleted_by = $2
+		SET deleted_at = NOW()
 		WHERE id = $1 AND deleted_at IS NULL
 	`
 
-	result, err := r.db.ExecContext(ctx, query, id, deleterID)
+	result, err := r.db.ExecContext(ctx, query, id)
 	if err != nil {
 		return fmt.Errorf("failed to delete person: %w", err)
 	}

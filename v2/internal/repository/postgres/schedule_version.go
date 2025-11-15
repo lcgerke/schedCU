@@ -3,14 +3,13 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"database/sql/driver"
 	"encoding/json"
 	"fmt"
 
 	"github.com/google/uuid"
 
-	"schedcu/v2/internal/entity"
-	"schedcu/v2/internal/repository"
+	"github.com/schedcu/v2/internal/entity"
+	"github.com/schedcu/v2/internal/repository"
 )
 
 // ScheduleVersionRepository implements repository.ScheduleVersionRepository for PostgreSQL
@@ -111,7 +110,7 @@ func (r *ScheduleVersionRepository) GetByID(ctx context.Context, id uuid.UUID) (
 }
 
 // GetByHospitalAndStatus retrieves schedule versions for a hospital with a specific status
-func (r *ScheduleVersionRepository) GetByHospitalAndStatus(ctx context.Context, hospitalID uuid.UUID, status entity.ScheduleVersionStatus) ([]*entity.ScheduleVersion, error) {
+func (r *ScheduleVersionRepository) GetByHospitalAndStatus(ctx context.Context, hospitalID uuid.UUID, status entity.VersionStatus) ([]*entity.ScheduleVersion, error) {
 	query := `
 		SELECT id, hospital_id, status, effective_start_date, effective_end_date, scrape_batch_id, validation_results,
 		       created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
@@ -363,28 +362,4 @@ func (r *ScheduleVersionRepository) Count(ctx context.Context) (int64, error) {
 	}
 
 	return count, nil
-}
-
-// Scan implements sql.Scanner for ScheduleVersionStatus
-func (s *entity.ScheduleVersionStatus) Scan(value interface{}) error {
-	if value == nil {
-		return nil
-	}
-
-	if v, ok := value.(string); ok {
-		*s = entity.ScheduleVersionStatus(v)
-		return nil
-	}
-
-	if v, ok := value.([]byte); ok {
-		*s = entity.ScheduleVersionStatus(v)
-		return nil
-	}
-
-	return fmt.Errorf("cannot scan %T into ScheduleVersionStatus", value)
-}
-
-// Value implements driver.Valuer for ScheduleVersionStatus
-func (s entity.ScheduleVersionStatus) Value() (driver.Value, error) {
-	return string(s), nil
 }

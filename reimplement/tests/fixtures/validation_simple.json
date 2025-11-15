@@ -1,0 +1,29 @@
+{
+  "errors": [
+    {
+      "field": "email",
+      "message": "invalid email format"
+    },
+    {
+      "field": "password",
+      "message": "password too short"
+    }
+  ],
+  "warnings": [
+    {
+      "field": "age",
+      "message": "under 18"
+    }
+  ],
+  "infos": [
+    {
+      "field": "source",
+      "message": "from external API"
+    }
+  ],
+  "context": {
+    "user_id": 123,
+    "timestamp": "2024-01-15T10:30:00Z",
+    "request_id": "req-abc123"
+  }
+}

@@ -8,8 +8,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 
-	"schedcu/v2/internal/entity"
-	"schedcu/v2/internal/repository"
+	"github.com/schedcu/v2/internal/entity"
+	"github.com/schedcu/v2/internal/repository"
 )
 
 // ShiftInstanceRepository implements repository.ShiftInstanceRepository for PostgreSQL
@@ -22,6 +22,47 @@ func NewShiftInstanceRepository(db *sql.DB) *ShiftInstanceRepository {
 	return &ShiftInstanceRepository{db: db}
 }
 
+// scanShiftInstance scans shift instance row data handling nullable string fields
+func scanShiftInstance(scanner interface{ Scan(...interface{}) error }, shift *entity.ShiftInstance) error {
+	var startTime sql.NullString
+	var endTime sql.NullString
+	var studyType sql.NullString
+	var specialtyConstraint sql.NullString
+
+	err := scanner.Scan(
+		&shift.ID,
+		&shift.ScheduleVersionID,
+		&shift.HospitalID,
+		(*string)(&shift.ShiftType),
+		&shift.ScheduleDate,
+		&startTime,
+		&endTime,
+		&studyType,
+		&specialtyConstraint,
+		&shift.DesiredCoverage,
+		&shift.IsMandatory,
+		&shift.CreatedAt,
+		&shift.CreatedBy,
+	)
+
+	if err == nil {
+		if startTime.Valid {
+			shift.StartTime = startTime.String
+		}
+		if endTime.Valid {
+			shift.EndTime = endTime.String
+		}
+		if studyType.Valid {
+			shift.StudyType = entity.StudyType(studyType.String)
+		}
+		if specialtyConstraint.Valid {
+			shift.SpecialtyConstraint = entity.SpecialtyType(specialtyConstraint.String)
+		}
+	}
+
+	return err
+}
+
 // Create creates a new shift instance
 func (r *ShiftInstanceRepository) Create(ctx context.Context, shift *entity.ShiftInstance) error {
 	if shift.ID == uuid.Nil {
@@ -32,8 +73,8 @@ func (r *ShiftInstanceRepository) Create(ctx context.Context, shift *entity.Shif
 		INSERT INTO shift_instances (
 			id, schedule_version_id, hospital_id, shift_type, schedule_date,
 			start_time, end_time, study_type, specialty_constraint, desired_coverage,
-			is_mandatory, created_at, created_by, updated_at, updated_by
-		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+			is_mandatory, created_at, created_by
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 	`
 
 	_, err := r.db.ExecContext(ctx, query,
@@ -50,8 +91,6 @@ func (r *ShiftInstanceRepository) Create(ctx context.Context, shift *entity.Shif
 		shift.IsMandatory,
 		shift.CreatedAt,
 		shift.CreatedBy,
-		shift.UpdatedAt,
-		shift.UpdatedBy,
 	)
 
 	if err != nil {
@@ -68,29 +107,12 @@ func (r *ShiftInstanceRepository) GetByID(ctx context.Context, id uuid.UUID) (*e
 	query := `
 		SELECT id, schedule_version_id, hospital_id, shift_type, schedule_date,
 		       start_time, end_time, study_type, specialty_constraint, desired_coverage,
-		       is_mandatory, created_at, created_by, updated_at, updated_by, deleted_at
+		       is_mandatory, created_at, created_by
 		FROM shift_instances
-		WHERE id = $1 AND deleted_at IS NULL
+		WHERE id = $1
 	`
 
-	err := r.db.QueryRowContext(ctx, query, id).Scan(
-		&shift.ID,
-		&shift.ScheduleVersionID,
-		&shift.HospitalID,
-		(*string)(&shift.ShiftType),
-		&shift.ScheduleDate,
-		&shift.StartTime,
-		&shift.EndTime,
-		(*string)(&shift.StudyType),
-		(*string)(&shift.SpecialtyConstraint),
-		&shift.DesiredCoverage,
-		&shift.IsMandatory,
-		&shift.CreatedAt,
-		&shift.CreatedBy,
-		&shift.UpdatedAt,
-		&shift.UpdatedBy,
-		&shift.DeletedAt,
-	)
+	err := scanShiftInstance(r.db.QueryRowContext(ctx, query, id), shift)
 
 	if err == sql.ErrNoRows {
 		return nil, &repository.NotFoundError{
@@ -106,45 +128,27 @@ func (r *ShiftInstanceRepository) GetByID(ctx context.Context, id uuid.UUID) (*e
 }
 
 // GetByScheduleVersion retrieves all shifts for a schedule version
-func (r *ShiftInstanceRepository) GetByScheduleVersion(ctx context.Context, scheduleVersionID uuid.UUID) ([]*entity.ShiftInstance, error) {
+func (r *ShiftInstanceRepository) GetByScheduleVersion(ctx context.Context, versionID uuid.UUID) ([]*entity.ShiftInstance, error) {
 	query := `
 		SELECT id, schedule_version_id, hospital_id, shift_type, schedule_date,
 		       start_time, end_time, study_type, specialty_constraint, desired_coverage,
-		       is_mandatory, created_at, created_by, updated_at, updated_by, deleted_at
+		       is_mandatory, created_at, created_by
 		FROM shift_instances
-		WHERE schedule_version_id = $1 AND deleted_at IS NULL
+		WHERE schedule_version_id = $1
 		ORDER BY schedule_date ASC
 	`
 
-	rows, err := r.db.QueryContext(ctx, query, scheduleVersionID)
+	rows, err := r.db.QueryContext(ctx, query, versionID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to query shifts: %w", err)
+		return nil, fmt.Errorf("failed to query shifts by schedule version: %w", err)
 	}
 	defer rows.Close()
 
 	var shifts []*entity.ShiftInstance
 	for rows.Next() {
 		shift := &entity.ShiftInstance{}
-		err := rows.Scan(
-			&shift.ID,
-			&shift.ScheduleVersionID,
-			&shift.HospitalID,
-			(*string)(&shift.ShiftType),
-			&shift.ScheduleDate,
-			&shift.StartTime,
-			&shift.EndTime,
-			(*string)(&shift.StudyType),
-			(*string)(&shift.SpecialtyConstraint),
-			&shift.DesiredCoverage,
-			&shift.IsMandatory,
-			&shift.CreatedAt,
-			&shift.CreatedBy,
-			&shift.UpdatedAt,
-			&shift.UpdatedBy,
-			&shift.DeletedAt,
-		)
-		if err != nil {
-			return nil, fmt.Errorf("failed to scan shift: %w", err)
+		if err := scanShiftInstance(rows, shift); err != nil {
+			return nil, fmt.Errorf("failed to scan shift instance: %w", err)
 		}
 		shifts = append(shifts, shift)
 	}
@@ -153,17 +157,17 @@ func (r *ShiftInstanceRepository) GetByScheduleVersion(ctx context.Context, sche
 }
 
 // GetByDateRange retrieves shifts within a date range for a schedule version
-func (r *ShiftInstanceRepository) GetByDateRange(ctx context.Context, scheduleVersionID uuid.UUID, startDate, endDate interface{}) ([]*entity.ShiftInstance, error) {
+func (r *ShiftInstanceRepository) GetByDateRange(ctx context.Context, versionID uuid.UUID, startDate, endDate entity.Date) ([]*entity.ShiftInstance, error) {
 	query := `
 		SELECT id, schedule_version_id, hospital_id, shift_type, schedule_date,
 		       start_time, end_time, study_type, specialty_constraint, desired_coverage,
-		       is_mandatory, created_at, created_by, updated_at, updated_by, deleted_at
+		       is_mandatory, created_at, created_by
 		FROM shift_instances
-		WHERE schedule_version_id = $1 AND schedule_date BETWEEN $2 AND $3 AND deleted_at IS NULL
+		WHERE schedule_version_id = $1 AND schedule_date >= $2 AND schedule_date <= $3
 		ORDER BY schedule_date ASC
 	`
 
-	rows, err := r.db.QueryContext(ctx, query, scheduleVersionID, startDate, endDate)
+	rows, err := r.db.QueryContext(ctx, query, versionID, startDate, endDate)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query shifts by date range: %w", err)
 	}
@@ -172,26 +176,8 @@ func (r *ShiftInstanceRepository) GetByDateRange(ctx context.Context, scheduleVe
 	var shifts []*entity.ShiftInstance
 	for rows.Next() {
 		shift := &entity.ShiftInstance{}
-		err := rows.Scan(
-			&shift.ID,
-			&shift.ScheduleVersionID,
-			&shift.HospitalID,
-			(*string)(&shift.ShiftType),
-			&shift.ScheduleDate,
-			&shift.StartTime,
-			&shift.EndTime,
-			(*string)(&shift.StudyType),
-			(*string)(&shift.SpecialtyConstraint),
-			&shift.DesiredCoverage,
-			&shift.IsMandatory,
-			&shift.CreatedAt,
-			&shift.CreatedBy,
-			&shift.UpdatedAt,
-			&shift.UpdatedBy,
-			&shift.DeletedAt,
-		)
-		if err != nil {
-			return nil, fmt.Errorf("failed to scan shift: %w", err)
+		if err := scanShiftInstance(rows, shift); err != nil {
+			return nil, fmt.Errorf("failed to scan shift instance: %w", err)
 		}
 		shifts = append(shifts, shift)
 	}
@@ -199,100 +185,57 @@ func (r *ShiftInstanceRepository) GetByDateRange(ctx context.Context, scheduleVe
 	return shifts, rows.Err()
 }
 
-// Update updates a shift instance
-func (r *ShiftInstanceRepository) Update(ctx context.Context, shift *entity.ShiftInstance) error {
+// GetAllByShiftIDs retrieves multiple shifts by their IDs (batch operation)
+func (r *ShiftInstanceRepository) GetAllByShiftIDs(ctx context.Context, shiftIDs []uuid.UUID) ([]*entity.ShiftInstance, error) {
+	if len(shiftIDs) == 0 {
+		return []*entity.ShiftInstance{}, nil
+	}
+
 	query := `
-		UPDATE shift_instances
-		SET shift_type = $1, schedule_date = $2, start_time = $3, end_time = $4,
-		    study_type = $5, specialty_constraint = $6, desired_coverage = $7,
-		    is_mandatory = $8, updated_at = $9, updated_by = $10
-		WHERE id = $11 AND deleted_at IS NULL
+		SELECT id, schedule_version_id, hospital_id, shift_type, schedule_date,
+		       start_time, end_time, study_type, specialty_constraint, desired_coverage,
+		       is_mandatory, created_at, created_by
+		FROM shift_instances
+		WHERE id = ANY($1)
+		ORDER BY schedule_date ASC
 	`
 
-	result, err := r.db.ExecContext(ctx, query,
-		string(shift.ShiftType),
-		shift.ScheduleDate,
-		shift.StartTime,
-		shift.EndTime,
-		string(shift.StudyType),
-		string(shift.SpecialtyConstraint),
-		shift.DesiredCoverage,
-		shift.IsMandatory,
-		shift.UpdatedAt,
-		shift.UpdatedBy,
-		shift.ID,
-	)
-
+	rows, err := r.db.QueryContext(ctx, query, pq.Array(shiftIDs))
 	if err != nil {
-		return fmt.Errorf("failed to update shift instance: %w", err)
+		return nil, fmt.Errorf("failed to query shifts by IDs: %w", err)
 	}
+	defer rows.Close()
 
-	rows, err := result.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("failed to get rows affected: %w", err)
-	}
-	if rows == 0 {
-		return &repository.NotFoundError{
-			ResourceType: "ShiftInstance",
-			ResourceID:   shift.ID.String(),
+	var shifts []*entity.ShiftInstance
+	for rows.Next() {
+		shift := &entity.ShiftInstance{}
+		if err := scanShiftInstance(rows, shift); err != nil {
+			return nil, fmt.Errorf("failed to scan shift instance: %w", err)
 		}
+		shifts = append(shifts, shift)
 	}
 
-	return nil
+	return shifts, rows.Err()
 }
 
-// Delete soft-deletes a shift instance
-func (r *ShiftInstanceRepository) Delete(ctx context.Context, id uuid.UUID, deleterID uuid.UUID) error {
-	query := `
-		UPDATE shift_instances
-		SET deleted_at = NOW(), deleted_by = $1
-		WHERE id = $2 AND deleted_at IS NULL
-	`
-
-	result, err := r.db.ExecContext(ctx, query, deleterID, id)
-	if err != nil {
-		return fmt.Errorf("failed to delete shift instance: %w", err)
-	}
-
-	rows, err := result.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("failed to get rows affected: %w", err)
-	}
-	if rows == 0 {
-		return &repository.NotFoundError{
-			ResourceType: "ShiftInstance",
-			ResourceID:   id.String(),
-		}
-	}
-
-	return nil
-}
-
-// Count returns the total count of non-deleted shifts
+// Count returns the total number of shifts
 func (r *ShiftInstanceRepository) Count(ctx context.Context) (int64, error) {
-	query := `SELECT COUNT(*) FROM shift_instances WHERE deleted_at IS NULL`
-
 	var count int64
+	query := `SELECT COUNT(*) FROM shift_instances`
 	err := r.db.QueryRowContext(ctx, query).Scan(&count)
 	if err != nil {
 		return 0, fmt.Errorf("failed to count shifts: %w", err)
 	}
-
 	return count, nil
 }
 
-// CountByScheduleVersion returns the count of shifts for a schedule version
-func (r *ShiftInstanceRepository) CountByScheduleVersion(ctx context.Context, scheduleVersionID uuid.UUID) (int64, error) {
-	query := `
-		SELECT COUNT(*) FROM shift_instances
-		WHERE schedule_version_id = $1 AND deleted_at IS NULL
-	`
-
+// CountByScheduleVersion returns the number of shifts in a schedule version
+func (r *ShiftInstanceRepository) CountByScheduleVersion(ctx context.Context, versionID uuid.UUID) (int64, error) {
 	var count int64
-	err := r.db.QueryRowContext(ctx, query, scheduleVersionID).Scan(&count)
+	query := `SELECT COUNT(*) FROM shift_instances WHERE schedule_version_id = $1`
+	err := r.db.QueryRowContext(ctx, query, versionID).Scan(&count)
 	if err != nil {
-		return 0, fmt.Errorf("failed to count shifts for schedule version: %w", err)
+		return 0, fmt.Errorf("failed to count shifts by version: %w", err)
 	}
-
 	return count, nil
 }

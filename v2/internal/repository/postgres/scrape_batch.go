@@ -7,8 +7,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"schedcu/v2/internal/entity"
-	"schedcu/v2/internal/repository"
+	"github.com/schedcu/v2/internal/entity"
+	"github.com/schedcu/v2/internal/repository"
 )
 
 // ScrapeBatchRepository implements repository.ScrapeBatchRepository for PostgreSQL

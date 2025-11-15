@@ -228,6 +228,7 @@ func createTestTables(ctx context.Context, db *sql.DB) error {
 		calculation_period_end_date TIMESTAMP NOT NULL,
 		coverage_by_position JSONB,
 		coverage_summary JSONB,
+		validation_errors JSONB,
 		query_count INTEGER DEFAULT 0,
 		calculated_at TIMESTAMP NOT NULL DEFAULT NOW(),
 		calculated_by UUID,
@@ -239,10 +240,11 @@ func createTestTables(ctx context.Context, db *sql.DB) error {
 		id UUID PRIMARY KEY,
 		user_id UUID,
 		action VARCHAR(255) NOT NULL,
-		resource_type VARCHAR(255),
-		resource_id UUID,
-		details JSONB,
-		created_at TIMESTAMP NOT NULL DEFAULT NOW()
+		resource VARCHAR(255),
+		old_values TEXT,
+		new_values TEXT,
+		timestamp TIMESTAMP NOT NULL DEFAULT NOW(),
+		ip_address VARCHAR(45)
 	);
 
 	-- Users
@@ -320,7 +322,7 @@ func TestPersonRepository_CRUD(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Create failed: %v", err)
 	}
-	if person.ID == entity.PersonID{} {
+	if person.ID == uuid.Nil {
 		t.Fatal("Create should set ID")
 	}
 
@@ -407,27 +409,25 @@ func TestShiftInstanceRepository_CRUD(t *testing.T) {
 
 	// Test Create
 	shift := &entity.ShiftInstance{
-		ScheduleVersionID:  versionID,
-		HospitalID:         hospID,
-		ShiftType:          entity.ShiftTypeDay,
-		ScheduleDate:       time.Now(),
-		StartTime:          "08:00",
-		EndTime:            "16:00",
-		StudyType:          entity.StudyTypeGeneral,
+		ScheduleVersionID:   versionID,
+		HospitalID:          hospID,
+		ShiftType:           entity.ShiftTypeDay,
+		ScheduleDate:        time.Now(),
+		StartTime:           "08:00",
+		EndTime:             "16:00",
+		StudyType:           entity.StudyTypeGeneral,
 		SpecialtyConstraint: entity.SpecialtyBodyOnly,
-		DesiredCoverage:    2,
-		IsMandatory:        false,
-		CreatedAt:          time.Now(),
-		CreatedBy:          uuid.New(),
-		UpdatedAt:          time.Now(),
-		UpdatedBy:          uuid.New(),
+		DesiredCoverage:     2,
+		IsMandatory:         false,
+		CreatedAt:           time.Now(),
+		CreatedBy:           uuid.New(),
 	}
 
 	err = repo.Create(ctx, shift)
 	if err != nil {
 		t.Fatalf("Create failed: %v", err)
 	}
-	if shift.ID == entity.ShiftInstanceID{} {
+	if shift.ID == uuid.Nil {
 		t.Fatal("Create should set ID")
 	}
 

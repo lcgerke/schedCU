@@ -8,8 +8,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"schedcu/v2/internal/entity"
-	"schedcu/v2/internal/repository"
+	"github.com/schedcu/v2/internal/entity"
+	"github.com/schedcu/v2/internal/repository"
 )
 
 // CoverageCalculationRepository implements repository.CoverageCalculationRepository for PostgreSQL
@@ -30,21 +30,26 @@ func (r *CoverageCalculationRepository) Create(ctx context.Context, calc *entity
 
 	coverageByPositionJSON, err := json.Marshal(calc.CoverageByPosition)
 	if err != nil {
-		return fmt.Errorf("failed to marshal coverage_by_position: %w", err)
+		return fmt.Errorf("failed to marshal coverage by position: %w", err)
 	}
 
 	coverageSummaryJSON, err := json.Marshal(calc.CoverageSummary)
 	if err != nil {
-		return fmt.Errorf("failed to marshal coverage_summary: %w", err)
+		return fmt.Errorf("failed to marshal coverage summary: %w", err)
+	}
+
+	validationJSON, err := json.Marshal(calc.ValidationErrors)
+	if err != nil {
+		return fmt.Errorf("failed to marshal validation errors: %w", err)
 	}
 
 	query := `
 		INSERT INTO coverage_calculations (
 			id, schedule_version_id, hospital_id, calculation_date,
 			calculation_period_start_date, calculation_period_end_date,
-			coverage_by_position, coverage_summary, query_count,
-			calculated_at, calculated_by
-		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+			coverage_by_position, coverage_summary, validation_errors,
+			query_count, calculated_at, calculated_by
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
 	`
 
 	_, err = r.db.ExecContext(ctx, query,
@@ -56,6 +61,7 @@ func (r *CoverageCalculationRepository) Create(ctx context.Context, calc *entity
 		calc.CalculationPeriodEndDate,
 		coverageByPositionJSON,
 		coverageSummaryJSON,
+		validationJSON,
 		calc.QueryCount,
 		calc.CalculatedAt,
 		calc.CalculatedBy,
@@ -75,15 +81,15 @@ func (r *CoverageCalculationRepository) GetByID(ctx context.Context, id uuid.UUI
 		CoverageSummary:    make(map[string]interface{}),
 	}
 
-	var coverageByPositionJSON, coverageSummaryJSON []byte
+	var coverageByPositionJSON, coverageSummaryJSON, validationJSON []byte
 
 	query := `
 		SELECT id, schedule_version_id, hospital_id, calculation_date,
 		       calculation_period_start_date, calculation_period_end_date,
-		       coverage_by_position, coverage_summary, query_count,
-		       calculated_at, calculated_by, deleted_at
+		       coverage_by_position, coverage_summary, validation_errors,
+		       query_count, calculated_at, calculated_by
 		FROM coverage_calculations
-		WHERE id = $1 AND deleted_at IS NULL
+		WHERE id = $1
 	`
 
 	err := r.db.QueryRowContext(ctx, query, id).Scan(
@@ -95,10 +101,10 @@ func (r *CoverageCalculationRepository) GetByID(ctx context.Context, id uuid.UUI
 		&calc.CalculationPeriodEndDate,
 		&coverageByPositionJSON,
 		&coverageSummaryJSON,
+		&validationJSON,
 		&calc.QueryCount,
 		&calc.CalculatedAt,
 		&calc.CalculatedBy,
-		&calc.DeletedAt,
 	)
 
 	if err == sql.ErrNoRows {
@@ -112,28 +118,35 @@ func (r *CoverageCalculationRepository) GetByID(ctx context.Context, id uuid.UUI
 	}
 
 	if err := json.Unmarshal(coverageByPositionJSON, &calc.CoverageByPosition); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal coverage_by_position: %w", err)
+		return nil, fmt.Errorf("failed to unmarshal coverage by position: %w", err)
 	}
+
 	if err := json.Unmarshal(coverageSummaryJSON, &calc.CoverageSummary); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal coverage_summary: %w", err)
+		return nil, fmt.Errorf("failed to unmarshal coverage summary: %w", err)
+	}
+
+	if len(validationJSON) > 0 {
+		if err := json.Unmarshal(validationJSON, &calc.ValidationErrors); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal validation errors: %w", err)
+		}
 	}
 
 	return calc, nil
 }
 
 // GetByScheduleVersion retrieves all coverage calculations for a schedule version
-func (r *CoverageCalculationRepository) GetByScheduleVersion(ctx context.Context, scheduleVersionID uuid.UUID) ([]*entity.CoverageCalculation, error) {
+func (r *CoverageCalculationRepository) GetByScheduleVersion(ctx context.Context, versionID uuid.UUID) ([]*entity.CoverageCalculation, error) {
 	query := `
 		SELECT id, schedule_version_id, hospital_id, calculation_date,
 		       calculation_period_start_date, calculation_period_end_date,
-		       coverage_by_position, coverage_summary, query_count,
-		       calculated_at, calculated_by, deleted_at
+		       coverage_by_position, coverage_summary, validation_errors,
+		       query_count, calculated_at, calculated_by
 		FROM coverage_calculations
-		WHERE schedule_version_id = $1 AND deleted_at IS NULL
+		WHERE schedule_version_id = $1
 		ORDER BY calculated_at DESC
 	`
 
-	rows, err := r.db.QueryContext(ctx, query, scheduleVersionID)
+	rows, err := r.db.QueryContext(ctx, query, versionID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query coverage calculations: %w", err)
 	}
@@ -145,7 +158,7 @@ func (r *CoverageCalculationRepository) GetByScheduleVersion(ctx context.Context
 			CoverageByPosition: make(map[string]int),
 			CoverageSummary:    make(map[string]interface{}),
 		}
-		var coverageByPositionJSON, coverageSummaryJSON []byte
+		var coverageByPositionJSON, coverageSummaryJSON, validationJSON []byte
 
 		err := rows.Scan(
 			&calc.ID,
@@ -156,20 +169,27 @@ func (r *CoverageCalculationRepository) GetByScheduleVersion(ctx context.Context
 			&calc.CalculationPeriodEndDate,
 			&coverageByPositionJSON,
 			&coverageSummaryJSON,
+			&validationJSON,
 			&calc.QueryCount,
 			&calc.CalculatedAt,
 			&calc.CalculatedBy,
-			&calc.DeletedAt,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan coverage calculation: %w", err)
 		}
 
 		if err := json.Unmarshal(coverageByPositionJSON, &calc.CoverageByPosition); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal coverage_by_position: %w", err)
+			return nil, fmt.Errorf("failed to unmarshal coverage by position: %w", err)
 		}
+
 		if err := json.Unmarshal(coverageSummaryJSON, &calc.CoverageSummary); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal coverage_summary: %w", err)
+			return nil, fmt.Errorf("failed to unmarshal coverage summary: %w", err)
+		}
+
+		if len(validationJSON) > 0 {
+			if err := json.Unmarshal(validationJSON, &calc.ValidationErrors); err != nil {
+				return nil, fmt.Errorf("failed to unmarshal validation errors: %w", err)
+			}
 		}
 
 		calcs = append(calcs, calc)
@@ -179,26 +199,26 @@ func (r *CoverageCalculationRepository) GetByScheduleVersion(ctx context.Context
 }
 
 // GetLatestByScheduleVersion retrieves the most recent coverage calculation for a schedule version
-func (r *CoverageCalculationRepository) GetLatestByScheduleVersion(ctx context.Context, scheduleVersionID uuid.UUID) (*entity.CoverageCalculation, error) {
+func (r *CoverageCalculationRepository) GetLatestByScheduleVersion(ctx context.Context, versionID uuid.UUID) (*entity.CoverageCalculation, error) {
 	calc := &entity.CoverageCalculation{
 		CoverageByPosition: make(map[string]int),
 		CoverageSummary:    make(map[string]interface{}),
 	}
 
-	var coverageByPositionJSON, coverageSummaryJSON []byte
+	var coverageByPositionJSON, coverageSummaryJSON, validationJSON []byte
 
 	query := `
 		SELECT id, schedule_version_id, hospital_id, calculation_date,
 		       calculation_period_start_date, calculation_period_end_date,
-		       coverage_by_position, coverage_summary, query_count,
-		       calculated_at, calculated_by, deleted_at
+		       coverage_by_position, coverage_summary, validation_errors,
+		       query_count, calculated_at, calculated_by
 		FROM coverage_calculations
-		WHERE schedule_version_id = $1 AND deleted_at IS NULL
+		WHERE schedule_version_id = $1
 		ORDER BY calculated_at DESC
 		LIMIT 1
 	`
 
-	err := r.db.QueryRowContext(ctx, query, scheduleVersionID).Scan(
+	err := r.db.QueryRowContext(ctx, query, versionID).Scan(
 		&calc.ID,
 		&calc.ScheduleVersionID,
 		&calc.HospitalID,
@@ -207,16 +227,16 @@ func (r *CoverageCalculationRepository) GetLatestByScheduleVersion(ctx context.C
 		&calc.CalculationPeriodEndDate,
 		&coverageByPositionJSON,
 		&coverageSummaryJSON,
+		&validationJSON,
 		&calc.QueryCount,
 		&calc.CalculatedAt,
 		&calc.CalculatedBy,
-		&calc.DeletedAt,
 	)
 
 	if err == sql.ErrNoRows {
 		return nil, &repository.NotFoundError{
 			ResourceType: "CoverageCalculation",
-			ResourceID:   scheduleVersionID.String(),
+			ResourceID:   versionID.String(),
 		}
 	}
 	if err != nil {
@@ -224,154 +244,29 @@ func (r *CoverageCalculationRepository) GetLatestByScheduleVersion(ctx context.C
 	}
 
 	if err := json.Unmarshal(coverageByPositionJSON, &calc.CoverageByPosition); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal coverage_by_position: %w", err)
+		return nil, fmt.Errorf("failed to unmarshal coverage by position: %w", err)
 	}
+
 	if err := json.Unmarshal(coverageSummaryJSON, &calc.CoverageSummary); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal coverage_summary: %w", err)
+		return nil, fmt.Errorf("failed to unmarshal coverage summary: %w", err)
+	}
+
+	if len(validationJSON) > 0 {
+		if err := json.Unmarshal(validationJSON, &calc.ValidationErrors); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal validation errors: %w", err)
+		}
 	}
 
 	return calc, nil
 }
 
-// GetByHospitalAndDate retrieves coverage calculations for a hospital on a specific date
-func (r *CoverageCalculationRepository) GetByHospitalAndDate(ctx context.Context, hospitalID uuid.UUID, date interface{}) ([]*entity.CoverageCalculation, error) {
-	query := `
-		SELECT id, schedule_version_id, hospital_id, calculation_date,
-		       calculation_period_start_date, calculation_period_end_date,
-		       coverage_by_position, coverage_summary, query_count,
-		       calculated_at, calculated_by, deleted_at
-		FROM coverage_calculations
-		WHERE hospital_id = $1 AND DATE(calculation_period_start_date) <= $2 AND DATE(calculation_period_end_date) >= $2
-		  AND deleted_at IS NULL
-		ORDER BY calculated_at DESC
-	`
-
-	rows, err := r.db.QueryContext(ctx, query, hospitalID, date)
-	if err != nil {
-		return nil, fmt.Errorf("failed to query coverage calculations: %w", err)
-	}
-	defer rows.Close()
-
-	var calcs []*entity.CoverageCalculation
-	for rows.Next() {
-		calc := &entity.CoverageCalculation{
-			CoverageByPosition: make(map[string]int),
-			CoverageSummary:    make(map[string]interface{}),
-		}
-		var coverageByPositionJSON, coverageSummaryJSON []byte
-
-		err := rows.Scan(
-			&calc.ID,
-			&calc.ScheduleVersionID,
-			&calc.HospitalID,
-			&calc.CalculationDate,
-			&calc.CalculationPeriodStartDate,
-			&calc.CalculationPeriodEndDate,
-			&coverageByPositionJSON,
-			&coverageSummaryJSON,
-			&calc.QueryCount,
-			&calc.CalculatedAt,
-			&calc.CalculatedBy,
-			&calc.DeletedAt,
-		)
-		if err != nil {
-			return nil, fmt.Errorf("failed to scan coverage calculation: %w", err)
-		}
-
-		if err := json.Unmarshal(coverageByPositionJSON, &calc.CoverageByPosition); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal coverage_by_position: %w", err)
-		}
-		if err := json.Unmarshal(coverageSummaryJSON, &calc.CoverageSummary); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal coverage_summary: %w", err)
-		}
-
-		calcs = append(calcs, calc)
-	}
-
-	return calcs, rows.Err()
-}
-
-// Update updates a coverage calculation
-func (r *CoverageCalculationRepository) Update(ctx context.Context, calc *entity.CoverageCalculation) error {
-	coverageByPositionJSON, err := json.Marshal(calc.CoverageByPosition)
-	if err != nil {
-		return fmt.Errorf("failed to marshal coverage_by_position: %w", err)
-	}
-
-	coverageSummaryJSON, err := json.Marshal(calc.CoverageSummary)
-	if err != nil {
-		return fmt.Errorf("failed to marshal coverage_summary: %w", err)
-	}
-
-	query := `
-		UPDATE coverage_calculations
-		SET coverage_by_position = $1, coverage_summary = $2, query_count = $3,
-		    calculated_at = $4
-		WHERE id = $5 AND deleted_at IS NULL
-	`
-
-	result, err := r.db.ExecContext(ctx, query,
-		coverageByPositionJSON,
-		coverageSummaryJSON,
-		calc.QueryCount,
-		calc.CalculatedAt,
-		calc.ID,
-	)
-
-	if err != nil {
-		return fmt.Errorf("failed to update coverage calculation: %w", err)
-	}
-
-	rows, err := result.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("failed to get rows affected: %w", err)
-	}
-	if rows == 0 {
-		return &repository.NotFoundError{
-			ResourceType: "CoverageCalculation",
-			ResourceID:   calc.ID.String(),
-		}
-	}
-
-	return nil
-}
-
-// Delete soft-deletes a coverage calculation
-func (r *CoverageCalculationRepository) Delete(ctx context.Context, id uuid.UUID) error {
-	query := `
-		UPDATE coverage_calculations
-		SET deleted_at = NOW()
-		WHERE id = $1 AND deleted_at IS NULL
-	`
-
-	result, err := r.db.ExecContext(ctx, query, id)
-	if err != nil {
-		return fmt.Errorf("failed to delete coverage calculation: %w", err)
-	}
-
-	rows, err := result.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("failed to get rows affected: %w", err)
-	}
-	if rows == 0 {
-		return &repository.NotFoundError{
-			ResourceType: "CoverageCalculation",
-			ResourceID:   id.String(),
-		}
-	}
-
-	return nil
-}
-
-// Count returns the total count of non-deleted coverage calculations
+// Count returns the total number of coverage calculations
 func (r *CoverageCalculationRepository) Count(ctx context.Context) (int64, error) {
-	query := `SELECT COUNT(*) FROM coverage_calculations WHERE deleted_at IS NULL`
-
 	var count int64
+	query := `SELECT COUNT(*) FROM coverage_calculations`
 	err := r.db.QueryRowContext(ctx, query).Scan(&count)
 	if err != nil {
 		return 0, fmt.Errorf("failed to count coverage calculations: %w", err)
 	}
-
 	return count, nil
 }

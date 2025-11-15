@@ -1,0 +1,56 @@
+{
+  "errors": [
+    {
+      "field": "file_format",
+      "message": "expected ODS file but got XLSX"
+    },
+    {
+      "field": "row_5",
+      "message": "missing required field: employee_id"
+    },
+    {
+      "field": "row_5",
+      "message": "invalid date format in shift_date: expected YYYY-MM-DD"
+    }
+  ],
+  "warnings": [
+    {
+      "field": "row_3",
+      "message": "shift overlaps with previous assignment"
+    },
+    {
+      "field": "row_8",
+      "message": "employee works more than 12 hours in a single day"
+    }
+  ],
+  "infos": [
+    {
+      "field": "parsing",
+      "message": "processed 50 rows successfully"
+    },
+    {
+      "field": "validation",
+      "message": "validation completed in 245ms"
+    }
+  ],
+  "context": {
+    "file_name": "schedule_2024_01.ods",
+    "file_size_bytes": 51200,
+    "sheet_name": "January",
+    "rows_processed": 50,
+    "rows_skipped": 2,
+    "processing_time_ms": 245,
+    "execution_host": "validator-prod-1",
+    "metadata": {
+      "version": "1.0.0",
+      "build_number": 12345,
+      "environment": "production"
+    },
+    "flags": [
+      "strict_validation",
+      "check_overlaps",
+      "check_max_hours"
+    ],
+    "source_system": "amion_api"
+  }
+}

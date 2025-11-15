@@ -8,8 +8,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/lib/pq"
 
-	"schedcu/v2/internal/entity"
-	"schedcu/v2/internal/repository"
+	"github.com/schedcu/v2/internal/entity"
+	"github.com/schedcu/v2/internal/repository"
 )
 
 // AssignmentRepository implements repository.AssignmentRepository for PostgreSQL
@@ -20,6 +20,37 @@ type AssignmentRepository struct {
 // NewAssignmentRepository creates a new AssignmentRepository
 func NewAssignmentRepository(db *sql.DB) *AssignmentRepository {
 	return &AssignmentRepository{db: db}
+}
+
+// scanAssignment scans assignment row data handling nullable fields
+func scanAssignment(scanner interface{ Scan(...interface{}) error }, assignment *entity.Assignment) error {
+	var originalShiftType sql.NullString
+	var source sql.NullString
+
+	// Determine if this is a single row scan or batch scan based on available columns
+	err := scanner.Scan(
+		&assignment.ID,
+		&assignment.PersonID,
+		&assignment.ShiftInstanceID,
+		&assignment.ScheduleDate,
+		&originalShiftType,
+		&source,
+		&assignment.CreatedAt,
+		&assignment.CreatedBy,
+		&assignment.DeletedAt,
+		&assignment.DeletedBy,
+	)
+
+	if err == nil {
+		if originalShiftType.Valid {
+			assignment.OriginalShiftType = originalShiftType.String
+		}
+		if source.Valid {
+			assignment.Source = entity.AssignmentSource(source.String)
+		}
+	}
+
+	return err
 }
 
 // Create creates a new assignment
@@ -62,18 +93,7 @@ func (r *AssignmentRepository) GetByID(ctx context.Context, id uuid.UUID) (*enti
 		WHERE id = $1 AND deleted_at IS NULL
 	`
 
-	err := r.db.QueryRowContext(ctx, query, id).Scan(
-		&assignment.ID,
-		&assignment.PersonID,
-		&assignment.ShiftInstanceID,
-		&assignment.ScheduleDate,
-		&assignment.OriginalShiftType,
-		(*string)(&assignment.Source),
-		&assignment.CreatedAt,
-		&assignment.CreatedBy,
-		&assignment.DeletedAt,
-		&assignment.DeletedBy,
-	)
+	err := scanAssignment(r.db.QueryRowContext(ctx, query, id), assignment)
 
 	if err == sql.ErrNoRows {
 		return nil, &repository.NotFoundError{
@@ -107,19 +127,7 @@ func (r *AssignmentRepository) GetByShiftInstance(ctx context.Context, shiftInst
 	var assignments []*entity.Assignment
 	for rows.Next() {
 		assignment := &entity.Assignment{}
-		err := rows.Scan(
-			&assignment.ID,
-			&assignment.PersonID,
-			&assignment.ShiftInstanceID,
-			&assignment.ScheduleDate,
-			&assignment.OriginalShiftType,
-			(*string)(&assignment.Source),
-			&assignment.CreatedAt,
-			&assignment.CreatedBy,
-			&assignment.DeletedAt,
-			&assignment.DeletedBy,
-		)
-		if err != nil {
+		if err := scanAssignment(rows, assignment); err != nil {
 			return nil, fmt.Errorf("failed to scan assignment: %w", err)
 		}
 		assignments = append(assignments, assignment)
@@ -151,19 +159,7 @@ func (r *AssignmentRepository) GetByPerson(ctx context.Context, personID uuid.UU
 	var assignments []*entity.Assignment
 	for rows.Next() {
 		assignment := &entity.Assignment{}
-		err := rows.Scan(
-			&assignment.ID,
-			&assignment.PersonID,
-			&assignment.ShiftInstanceID,
-			&assignment.ScheduleDate,
-			&assignment.OriginalShiftType,
-			(*string)(&assignment.Source),
-			&assignment.CreatedAt,
-			&assignment.CreatedBy,
-			&assignment.DeletedAt,
-			&assignment.DeletedBy,
-		)
-		if err != nil {
+		if err := scanAssignment(rows, assignment); err != nil {
 			return nil, fmt.Errorf("failed to scan assignment: %w", err)
 		}
 		assignments = append(assignments, assignment)
@@ -195,19 +191,7 @@ func (r *AssignmentRepository) GetByPersonAndDateRange(ctx context.Context, pers
 	var assignments []*entity.Assignment
 	for rows.Next() {
 		assignment := &entity.Assignment{}
-		err := rows.Scan(
-			&assignment.ID,
-			&assignment.PersonID,
-			&assignment.ShiftInstanceID,
-			&assignment.ScheduleDate,
-			&assignment.OriginalShiftType,
-			(*string)(&assignment.Source),
-			&assignment.CreatedAt,
-			&assignment.CreatedBy,
-			&assignment.DeletedAt,
-			&assignment.DeletedBy,
-		)
-		if err != nil {
+		if err := scanAssignment(rows, assignment); err != nil {
 			return nil, fmt.Errorf("failed to scan assignment: %w", err)
 		}
 		assignments = append(assignments, assignment)
@@ -240,19 +224,7 @@ func (r *AssignmentRepository) GetByScheduleVersion(ctx context.Context, schedul
 	var assignments []*entity.Assignment
 	for rows.Next() {
 		assignment := &entity.Assignment{}
-		err := rows.Scan(
-			&assignment.ID,
-			&assignment.PersonID,
-			&assignment.ShiftInstanceID,
-			&assignment.ScheduleDate,
-			&assignment.OriginalShiftType,
-			(*string)(&assignment.Source),
-			&assignment.CreatedAt,
-			&assignment.CreatedBy,
-			&assignment.DeletedAt,
-			&assignment.DeletedBy,
-		)
-		if err != nil {
+		if err := scanAssignment(rows, assignment); err != nil {
 			return nil, fmt.Errorf("failed to scan assignment: %w", err)
 		}
 		assignments = append(assignments, assignment)
@@ -369,19 +341,7 @@ func (r *AssignmentRepository) GetAllByShiftIDs(ctx context.Context, shiftInstan
 	var assignments []*entity.Assignment
 	for rows.Next() {
 		assignment := &entity.Assignment{}
-		err := rows.Scan(
-			&assignment.ID,
-			&assignment.PersonID,
-			&assignment.ShiftInstanceID,
-			&assignment.ScheduleDate,
-			&assignment.OriginalShiftType,
-			(*string)(&assignment.Source),
-			&assignment.CreatedAt,
-			&assignment.CreatedBy,
-			&assignment.DeletedAt,
-			&assignment.DeletedBy,
-		)
-		if err != nil {
+		if err := scanAssignment(rows, assignment); err != nil {
 			return nil, fmt.Errorf("failed to scan assignment: %w", err)
 		}
 		assignments = append(assignments, assignment)
