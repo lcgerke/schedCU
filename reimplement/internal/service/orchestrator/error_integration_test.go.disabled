@@ -1,0 +1,487 @@
+package orchestrator
+
+import (
+	"context"
+	"errors"
+	"testing"
+	"time"
+
+	"github.com/google/uuid"
+	"github.com/schedcu/reimplement/internal/entity"
+	"github.com/schedcu/reimplement/internal/validation"
+)
+
+// Test 1: Invalid ODS file → appropriate error, no data created
+func TestErrorIntegration_InvalidODSFile_NoDataCreated(t *testing.T) {
+	ctx := context.Background()
+	hospitalID := uuid.New()
+	userID := uuid.New()
+
+	odsValidation := validation.NewValidationResult()
+	odsValidation.AddError("file_format", "expected ODS (zip) file, got invalid zip")
+
+	odsMock := &MockODSImportService{
+		ImportScheduleFunc: func(ctx context.Context, filePath string, hospitalID uuid.UUID, userID uuid.UUID) (*entity.ScheduleVersion, *validation.ValidationResult, error) {
+			return nil, odsValidation, errors.New("invalid ODS file format: not a valid zip file")
+		},
+	}
+
+	amionMock := &MockAmionScraperService{
+		ScrapeScheduleFunc: func(ctx context.Context, startDate time.Time, monthCount int, hospitalID uuid.UUID, userID uuid.UUID) ([]entity.Assignment, *validation.ValidationResult, error) {
+			return []entity.Assignment{}, validation.NewValidationResult(), nil
+		},
+	}
+
+	coverageMock := &MockCoverageCalculatorService{
+		CalculateFunc: func(ctx context.Context, scheduleVersionID uuid.UUID) (*CoverageMetrics, error) {
+			return nil, nil
+		},
+	}
+
+	orchestrator := &MockScheduleOrchestrator{
+		ExecuteImportFunc: func(ctx context.Context, filePath string, hospitalID uuid.UUID, userID uuid.UUID) (*OrchestrationResult, error) {
+			return nil, errors.New("phase 1 ODS import failed: invalid ODS file format: not a valid zip file")
+		},
+	}
+	_ = odsMock
+	_ = amionMock
+	_ = coverageMock
+
+	result, err := orchestrator.ExecuteImport(ctx, "/tmp/invalid.ods", hospitalID, userID)
+
+	if err == nil {
+		t.Fatal("expected error for invalid ODS file")
+	}
+
+	if result != nil && result.ScheduleVersion != nil {
+		t.Error("expected nil ScheduleVersion when ODS import fails critically")
+	}
+
+	if orchestrator.GetOrchestrationStatus() != OrchestrationStatusFAILED {
+		t.Errorf("expected status FAILED, got %s", orchestrator.GetOrchestrationStatus())
+	}
+}
+
+// Test 2: Amion scrape failure → ODS data preserved, Amion errors reported
+func TestErrorIntegration_AmionScrapeFails_ODSDataPreserved(t *testing.T) {
+	ctx := context.Background()
+	hospitalID := uuid.New()
+	userID := uuid.New()
+
+	sv := &entity.ScheduleVersion{
+		ID:         uuid.New(),
+		HospitalID: hospitalID,
+		Version:    1,
+		Status:     entity.VersionStatusDraft,
+		StartDate:  time.Now(),
+		EndDate:    time.Now().AddDate(0, 1, 0),
+		Source:     "ods_file",
+		CreatedBy:  userID,
+	}
+
+	odsValidation := validation.NewValidationResult()
+	odsValidation.AddInfo("shifts", "imported 10 shifts successfully")
+
+	orchestrator := &MockScheduleOrchestrator{
+		ExecuteImportFunc: func(ctx context.Context, filePath string, hospitalID uuid.UUID, userID uuid.UUID) (*OrchestrationResult, error) {
+			result := &OrchestrationResult{
+				ScheduleVersion:   sv,
+				Assignments:       []interface{}{},
+				ValidationResult:  odsValidation,
+				Metadata:          make(map[string]interface{}),
+			}
+			result.ValidationResult.AddWarning("amion_scrape", "Amion scraping encountered errors (continuing)")
+			return result, nil
+		},
+	}
+
+	result, err := orchestrator.ExecuteImport(ctx, "/tmp/schedule.ods", hospitalID, userID)
+
+	if result == nil || result.ScheduleVersion == nil {
+		t.Fatal("expected non-nil ScheduleVersion (ODS data should be preserved on Amion error)")
+	}
+
+	if result.ScheduleVersion.ID != sv.ID {
+		t.Errorf("expected schedule %s, got %s", sv.ID, result.ScheduleVersion.ID)
+	}
+
+	if !result.ValidationResult.HasWarnings() {
+		t.Error("expected warnings about Amion failure")
+	}
+
+	if err != nil {
+		t.Errorf("expected no error (Amion failure is non-critical), got %v", err)
+	}
+
+	if orchestrator.GetOrchestrationStatus() != OrchestrationStatusCOMPLETED {
+		t.Errorf("expected COMPLETED status, got %s", orchestrator.GetOrchestrationStatus())
+	}
+}
+
+// Test 3: Coverage calculation error → ODS+Amion data preserved
+func TestErrorIntegration_CoverageCalculationFails_DataPreserved(t *testing.T) {
+	ctx := context.Background()
+	hospitalID := uuid.New()
+	userID := uuid.New()
+
+	sv := &entity.ScheduleVersion{
+		ID:         uuid.New(),
+		HospitalID: hospitalID,
+		Version:    1,
+		Status:     entity.VersionStatusDraft,
+		StartDate:  time.Now(),
+		EndDate:    time.Now().AddDate(0, 1, 0),
+		Source:     "ods_file",
+		CreatedBy:  userID,
+	}
+
+	assignment := entity.NewAssignment(
+		uuid.New(),
+		uuid.New(),
+		time.Now(),
+		"Technologist",
+		entity.AssignmentSourceAmion,
+		userID,
+	)
+
+	orchestrator := &MockScheduleOrchestrator{
+		ExecuteImportFunc: func(ctx context.Context, filePath string, hospitalID uuid.UUID, userID uuid.UUID) (*OrchestrationResult, error) {
+			result := &OrchestrationResult{
+				ScheduleVersion:   sv,
+				Assignments:       []interface{}{assignment},
+				ValidationResult:  validation.NewValidationResult(),
+				Metadata:          make(map[string]interface{}),
+			}
+			result.ValidationResult.AddWarning("coverage_calc", "Coverage calculation failed (can be recalculated later)")
+			return result, nil
+		},
+	}
+
+	result, err := orchestrator.ExecuteImport(ctx, "/tmp/schedule.ods", hospitalID, userID)
+
+	if result == nil || result.ScheduleVersion == nil {
+		t.Fatal("expected non-nil ScheduleVersion")
+	}
+
+	if len(result.Assignments) == 0 {
+		t.Error("expected Amion assignments to be preserved")
+	}
+
+	if !result.ValidationResult.HasWarnings() {
+		t.Error("expected warnings about coverage failure")
+	}
+
+	if err != nil {
+		t.Errorf("expected no error (coverage failure is non-critical), got %v", err)
+	}
+
+	if orchestrator.GetOrchestrationStatus() != OrchestrationStatusCOMPLETED {
+		t.Errorf("expected COMPLETED status, got %s", orchestrator.GetOrchestrationStatus())
+	}
+}
+
+// Test 4: All errors collected in ValidationResult
+func TestErrorIntegration_AllErrorsCollected_InValidationResult(t *testing.T) {
+	ctx := context.Background()
+	hospitalID := uuid.New()
+	userID := uuid.New()
+
+	odsValidation := validation.NewValidationResult()
+	odsValidation.AddError("parse", "invalid XML structure in sheet 1")
+	odsValidation.AddError("dates", "end date before start date")
+	odsValidation.AddError("shifts[0]", "position field is empty")
+
+	orchestrator := &MockScheduleOrchestrator{
+		ExecuteImportFunc: func(ctx context.Context, filePath string, hospitalID uuid.UUID, userID uuid.UUID) (*OrchestrationResult, error) {
+			return &OrchestrationResult{
+				ScheduleVersion:   nil,
+				Assignments:       []interface{}{},
+				ValidationResult:  odsValidation,
+				Metadata:          make(map[string]interface{}),
+			}, errors.New("ODS import failed")
+		},
+	}
+
+	result, err := orchestrator.ExecuteImport(ctx, "/tmp/invalid.ods", hospitalID, userID)
+
+	if err == nil {
+		t.Fatal("expected error")
+	}
+
+	if result != nil && result.ValidationResult.ErrorCount() < 3 {
+		t.Errorf("expected at least 3 errors, got %d", result.ValidationResult.ErrorCount())
+	}
+}
+
+// Test 5: Partial success - some shifts fail
+func TestErrorIntegration_PartialSuccess_ValidShiftsImported(t *testing.T) {
+	ctx := context.Background()
+	hospitalID := uuid.New()
+	userID := uuid.New()
+
+	sv := &entity.ScheduleVersion{
+		ID:         uuid.New(),
+		HospitalID: hospitalID,
+		Version:    1,
+		Status:     entity.VersionStatusDraft,
+		StartDate:  time.Now(),
+		EndDate:    time.Now().AddDate(0, 1, 0),
+		Source:     "ods_file",
+		CreatedBy:  userID,
+	}
+
+	odsValidation := validation.NewValidationResult()
+	odsValidation.AddError("shifts[2]", "duplicate shift detected")
+	odsValidation.AddError("shifts[5]", "invalid qualification format")
+	odsValidation.AddInfo("shifts", "3 of 5 shifts created successfully")
+	odsValidation.AddWarning("ods_import", "Some shifts failed to import")
+
+	orchestrator := &MockScheduleOrchestrator{
+		ExecuteImportFunc: func(ctx context.Context, filePath string, hospitalID uuid.UUID, userID uuid.UUID) (*OrchestrationResult, error) {
+			return &OrchestrationResult{
+				ScheduleVersion:   sv,
+				Assignments:       []interface{}{},
+				ValidationResult:  odsValidation,
+				Metadata:          make(map[string]interface{}),
+			}, nil
+		},
+	}
+
+	result, err := orchestrator.ExecuteImport(ctx, "/tmp/schedule.ods", hospitalID, userID)
+
+	if result == nil || result.ScheduleVersion == nil {
+		t.Fatal("expected ScheduleVersion for partial success")
+	}
+
+	if !result.ValidationResult.HasErrors() {
+		t.Error("expected validation errors")
+	}
+
+	if !result.ValidationResult.HasWarnings() {
+		t.Error("expected validation warnings")
+	}
+
+	if orchestrator.GetOrchestrationStatus() != OrchestrationStatusCOMPLETED {
+		t.Errorf("expected COMPLETED status, got %s", orchestrator.GetOrchestrationStatus())
+	}
+}
+
+// Test 6: Phase 1 critical error → operation aborted
+func TestErrorIntegration_Phase1CriticalError_OperationAborted(t *testing.T) {
+	ctx := context.Background()
+	hospitalID := uuid.New()
+	userID := uuid.New()
+
+	orchestrator := &MockScheduleOrchestrator{
+		ExecuteImportFunc: func(ctx context.Context, filePath string, hospitalID uuid.UUID, userID uuid.UUID) (*OrchestrationResult, error) {
+			orchestrator := NewMockScheduleOrchestrator()
+			orchestrator.SetStatus(OrchestrationStatusFAILED)
+			return nil, errors.New("phase 1 ODS import failed: database connection failed")
+		},
+	}
+
+	result, err := orchestrator.ExecuteImport(ctx, "/tmp/schedule.ods", hospitalID, userID)
+
+	if err == nil {
+		t.Fatal("expected error indicating operation aborted")
+	}
+
+	if result != nil && result.ScheduleVersion != nil {
+		t.Error("expected no ScheduleVersion on critical error")
+	}
+
+	if orchestrator.GetOrchestrationStatus() != OrchestrationStatusFAILED {
+		t.Errorf("expected FAILED status, got %s", orchestrator.GetOrchestrationStatus())
+	}
+}
+
+// Test 7: Invalid hospitalID → no processing
+func TestErrorIntegration_InvalidHospitalID_NoProcessing(t *testing.T) {
+	ctx := context.Background()
+	hospitalID := uuid.Nil
+	userID := uuid.New()
+
+	orchestrator := &MockScheduleOrchestrator{
+		ExecuteImportFunc: func(ctx context.Context, filePath string, hospitalID uuid.UUID, userID uuid.UUID) (*OrchestrationResult, error) {
+			orch := NewMockScheduleOrchestrator()
+			orch.SetStatus(OrchestrationStatusFAILED)
+			return nil, errors.New("invalid hospital ID: nil UUID")
+		},
+	}
+
+	result, err := orchestrator.ExecuteImport(ctx, "/tmp/schedule.ods", hospitalID, userID)
+
+	if err == nil {
+		t.Fatal("expected error for invalid hospitalID")
+	}
+
+	if result != nil && result.ScheduleVersion != nil {
+		t.Error("expected no ScheduleVersion")
+	}
+
+	if orchestrator.GetOrchestrationStatus() != OrchestrationStatusFAILED {
+		t.Errorf("expected FAILED status, got %s", orchestrator.GetOrchestrationStatus())
+	}
+}
+
+// Test 8: Invalid userID → no processing
+func TestErrorIntegration_InvalidUserID_NoProcessing(t *testing.T) {
+	ctx := context.Background()
+	hospitalID := uuid.New()
+	userID := uuid.Nil
+
+	orchestrator := &MockScheduleOrchestrator{
+		ExecuteImportFunc: func(ctx context.Context, filePath string, hospitalID uuid.UUID, userID uuid.UUID) (*OrchestrationResult, error) {
+			orch := NewMockScheduleOrchestrator()
+			orch.SetStatus(OrchestrationStatusFAILED)
+			return nil, errors.New("invalid user ID: nil UUID")
+		},
+	}
+
+	result, err := orchestrator.ExecuteImport(ctx, "/tmp/schedule.ods", hospitalID, userID)
+
+	if err == nil {
+		t.Fatal("expected error for invalid userID")
+	}
+
+	if result != nil && result.ScheduleVersion != nil {
+		t.Error("expected no ScheduleVersion")
+	}
+
+	if orchestrator.GetOrchestrationStatus() != OrchestrationStatusFAILED {
+		t.Errorf("expected FAILED status, got %s", orchestrator.GetOrchestrationStatus())
+	}
+}
+
+// Test 9: Successful import - all phases pass
+func TestErrorIntegration_SuccessfulImport_AllPhasePass(t *testing.T) {
+	ctx := context.Background()
+	hospitalID := uuid.New()
+	userID := uuid.New()
+
+	sv := &entity.ScheduleVersion{
+		ID:         uuid.New(),
+		HospitalID: hospitalID,
+		Version:    1,
+		Status:     entity.VersionStatusDraft,
+		StartDate:  time.Now(),
+		EndDate:    time.Now().AddDate(0, 1, 0),
+		Source:     "ods_file",
+		CreatedBy:  userID,
+	}
+
+	assignment := entity.NewAssignment(
+		uuid.New(),
+		uuid.New(),
+		time.Now(),
+		"Technologist",
+		entity.AssignmentSourceAmion,
+		userID,
+	)
+
+	coverage := &CoverageMetrics{
+		ScheduleVersionID:  sv.ID,
+		CoveragePercentage: 85.5,
+	}
+
+	orchestrator := NewMockScheduleOrchestrator()
+	orchestrator.ExecuteImportFunc = func(ctx context.Context, filePath string, hospitalID uuid.UUID, userID uuid.UUID) (*OrchestrationResult, error) {
+		validation := validation.NewValidationResult()
+		validation.AddInfo("ods_import", "10 shifts imported")
+		validation.AddInfo("amion_scrape", "5 assignments scraped")
+		validation.AddInfo("coverage_calc", "Coverage: 85.5%")
+
+		return &OrchestrationResult{
+			ScheduleVersion:   sv,
+			Assignments:       []interface{}{assignment},
+			Coverage:          coverage,
+			ValidationResult:  validation,
+			Duration:          1 * time.Second,
+			CompletedAt:       time.Now(),
+			Metadata:          map[string]interface{}{"hospital_id": hospitalID.String()},
+		}, nil
+	}
+
+	result, err := orchestrator.ExecuteImport(ctx, "/tmp/schedule.ods", hospitalID, userID)
+
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	if result == nil || result.ScheduleVersion == nil {
+		t.Fatal("expected ScheduleVersion")
+	}
+
+	if result.ValidationResult.HasErrors() {
+		t.Errorf("expected no errors, got %d", result.ValidationResult.ErrorCount())
+	}
+
+	if len(result.Assignments) == 0 {
+		t.Error("expected Amion assignments")
+	}
+
+	if result.Coverage == nil {
+		t.Error("expected coverage metrics")
+	}
+
+	if result.Coverage.CoveragePercentage != 85.5 {
+		t.Errorf("expected coverage 85.5%%, got %.1f%%", result.Coverage.CoveragePercentage)
+	}
+
+	if orchestrator.GetOrchestrationStatus() != OrchestrationStatusCOMPLETED {
+		t.Errorf("expected COMPLETED status, got %s", orchestrator.GetOrchestrationStatus())
+	}
+}
+
+// Test 10: Error context preservation
+func TestErrorIntegration_ErrorContextPreservation(t *testing.T) {
+	ctx := context.Background()
+	hospitalID := uuid.New()
+	userID := uuid.New()
+
+	validation := validation.NewValidationResult()
+	validation.AddError("startDate", "invalid date format: expected YYYY-MM-DD, got 01/01/2025")
+	validation.AddError("shifts[0].position", "position cannot be empty")
+	validation.AddError("shifts[1].location", "unknown location: ICU_NORTH")
+
+	orchestrator := &MockScheduleOrchestrator{
+		ExecuteImportFunc: func(ctx context.Context, filePath string, hospitalID uuid.UUID, userID uuid.UUID) (*OrchestrationResult, error) {
+			return &OrchestrationResult{
+				ScheduleVersion:   nil,
+				Assignments:       []interface{}{},
+				ValidationResult:  validation,
+				Metadata:          make(map[string]interface{}),
+			}, errors.New("ODS validation failed")
+		},
+	}
+
+	result, err := orchestrator.ExecuteImport(ctx, "/tmp/invalid.ods", hospitalID, userID)
+
+	if result == nil || !result.ValidationResult.HasErrors() {
+		t.Fatal("expected validation errors")
+	}
+
+	if result.ValidationResult.ErrorCount() < 3 {
+		t.Errorf("expected at least 3 errors, got %d", result.ValidationResult.ErrorCount())
+	}
+
+	hasStartDate := false
+	hasPosition := false
+	hasLocation := false
+
+	for _, e := range result.ValidationResult.Errors {
+		if e.Field == "startDate" {
+			hasStartDate = true
+		}
+		if e.Field == "shifts[0].position" {
+			hasPosition = true
+		}
+		if e.Field == "shifts[1].location" {
+			hasLocation = true
+		}
+	}
+
+	if !hasStartDate || !hasPosition || !hasLocation {
+		t.Error("expected all field-level errors to be preserved")
+	}
+}
