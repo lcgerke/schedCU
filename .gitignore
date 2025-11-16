@@ -64,6 +64,7 @@ config/secrets.*
 /reimplement/cmd/cutout-sets/cutout-sets
 /reimplement/cmd/minimum-spanning-cover/minimum-spanning-cover
 /reimplement/cmd/minimum-shift-cover/minimum-shift-cover
+/reimplement/cmd/describe-shift-positions/describe-shift-positions
 *.exe
 server
 generate-ods-fixtures
@@ -75,4 +76,5 @@ cutout_sets.json
 cutout_sets_export.json
 minimum_spanning_cover.json
 minimum_shift_position_cover.json
+shift_position_descriptions.json
 coverage_examples.txt
