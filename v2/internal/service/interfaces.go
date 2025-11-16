@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"io"
 	"time"
 
 	"github.com/schedcu/v2/internal/entity"
@@ -23,7 +24,13 @@ type ScheduleVersionService interface {
 
 // ODSImportService handles importing schedules from ODS files
 type ODSImportService interface {
-	// Note: Placeholder interface - actual method signatures defined in implementation
+	ImportODSFile(
+		ctx context.Context,
+		hospitalID entity.HospitalID,
+		version *entity.ScheduleVersion,
+		filename string,
+		content io.Reader,
+	) (*entity.ScrapeBatch, *validation.Result, error)
 }
 
 // AmionImportService handles scraping and importing schedules from Amion
@@ -39,7 +46,8 @@ type CoverageCalculator interface {
 
 // ScheduleOrchestrator coordinates the full scheduling workflow
 type ScheduleOrchestrator interface {
-	// Note: Placeholder interface - actual method signatures defined in implementation
+	// ExecuteFullWorkflow executes the complete 3-phase workflow
+	// This is a placeholder - actual signatures are in implementation
 }
 
 // ODSParser parses ODS files and extracts schedule data

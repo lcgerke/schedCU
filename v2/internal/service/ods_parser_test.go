@@ -116,7 +116,9 @@ func TestODSParserCoverageGrid(t *testing.T) {
 	}
 
 	result := validation.NewResult()
-	coverage := parser.extractCoverageGridFromTable(grid, result)
+	// Cast to concrete type to access private method in test
+	parserImpl := parser.(*odsParser)
+	coverage := parserImpl.extractCoverageGridFromTable(grid, result)
 
 	// Should find coverage assignments
 	assert.Greater(t, len(coverage), 0, "Should find coverage assignments")

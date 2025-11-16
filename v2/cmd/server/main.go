@@ -29,7 +29,7 @@ func main() {
 	// Full implementations will be added in Phase 1
 	// For now, we're testing the API routing structure
 	coverageCalc := service.NewDynamicCoverageCalculator(nil, nil)
-	var versionService *service.ScheduleVersionService
+	var versionService service.ScheduleVersionService
 	// versionService will be properly initialized in Phase 1 Week 4
 
 	// Create job scheduler (requires Redis)
