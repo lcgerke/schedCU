@@ -60,6 +60,12 @@ config/secrets.*
 /reimplement/cmd/spanning-sets/spanning-sets
 /reimplement/cmd/describe-studies-go/describe-studies-go
 /reimplement/cmd/hour-viewer-go/hour-viewer-go
+/reimplement/cmd/rank-spanning-sets/rank-spanning-sets
 *.exe
 server
 generate-ods-fixtures
+
+# Preference data files
+spanning_set_preferences.json
+spanning_set_preferences_export.json
+coverage_examples.txt
