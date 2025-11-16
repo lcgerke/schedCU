@@ -61,11 +61,14 @@ config/secrets.*
 /reimplement/cmd/describe-studies-go/describe-studies-go
 /reimplement/cmd/hour-viewer-go/hour-viewer-go
 /reimplement/cmd/rank-spanning-sets/rank-spanning-sets
+/reimplement/cmd/cutout-sets/cutout-sets
 *.exe
 server
 generate-ods-fixtures
 
-# Preference data files
+# Preference and cutout data files
 spanning_set_preferences.json
 spanning_set_preferences_export.json
+cutout_sets.json
+cutout_sets_export.json
 coverage_examples.txt
