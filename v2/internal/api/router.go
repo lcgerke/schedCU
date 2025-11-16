@@ -15,13 +15,13 @@ type Router struct {
 	handlers   *Handlers
 }
 
-// Services holds all business logic services
+// ServiceDeps holds all business logic services
 type ServiceDeps struct {
-	OdsImporter    *service.ODSImportService
-	AmionImporter  *service.AmionImportService
-	Orchestrator   *service.ScheduleOrchestrator
-	CoverageCalc   *service.DynamicCoverageCalculator
-	VersionService *service.ScheduleVersionService
+	OdsImporter    service.ODSImportService
+	AmionImporter  service.AmionImportService
+	Orchestrator   service.ScheduleOrchestrator
+	CoverageCalc   service.CoverageCalculator
+	VersionService service.ScheduleVersionService
 }
 
 // NewRouter creates a new Echo router with all routes

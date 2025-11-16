@@ -86,6 +86,52 @@ func (r *PersonRepository) GetByID(ctx context.Context, id uuid.UUID) (*entity.P
 	return person, nil
 }
 
+// GetAllByIDs retrieves multiple persons by their IDs in a single batch query
+func (r *PersonRepository) GetAllByIDs(ctx context.Context, ids []uuid.UUID) ([]*entity.Person, error) {
+	if len(ids) == 0 {
+		return []*entity.Person{}, nil
+	}
+
+	query := `
+		SELECT id, email, name, specialty, active, aliases, created_at, updated_at, deleted_at
+		FROM persons
+		WHERE id = ANY($1) AND deleted_at IS NULL
+		ORDER BY name
+	`
+
+	rows, err := r.db.QueryContext(ctx, query, pq.Array(ids))
+	if err != nil {
+		return nil, fmt.Errorf("failed to get persons by IDs: %w", err)
+	}
+	defer rows.Close()
+
+	persons := make([]*entity.Person, 0, len(ids))
+	for rows.Next() {
+		person := &entity.Person{}
+		err := rows.Scan(
+			&person.ID,
+			&person.Email,
+			&person.Name,
+			(*string)(&person.Specialty),
+			&person.Active,
+			pq.Array(&person.Aliases),
+			&person.CreatedAt,
+			&person.UpdatedAt,
+			&person.DeletedAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan person: %w", err)
+		}
+		persons = append(persons, person)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating persons: %w", err)
+	}
+
+	return persons, nil
+}
+
 // GetByEmail retrieves a person by email
 func (r *PersonRepository) GetByEmail(ctx context.Context, email string) (*entity.Person, error) {
 	person := &entity.Person{}

@@ -13,18 +13,18 @@ import (
 
 // JobHandlers manages job execution handlers
 type JobHandlers struct {
-	odsImporter    *service.ODSImportService
-	amionImporter  *service.AmionImportService
-	coverageCalc   *service.DynamicCoverageCalculator
-	versionService *service.ScheduleVersionService
+	odsImporter    service.ODSImportService
+	amionImporter  service.AmionImportService
+	coverageCalc   service.CoverageCalculator
+	versionService service.ScheduleVersionService
 }
 
 // NewJobHandlers creates a new job handlers instance
 func NewJobHandlers(
-	odsImporter *service.ODSImportService,
-	amionImporter *service.AmionImportService,
-	coverageCalc *service.DynamicCoverageCalculator,
-	versionService *service.ScheduleVersionService,
+	odsImporter service.ODSImportService,
+	amionImporter service.AmionImportService,
+	coverageCalc service.CoverageCalculator,
+	versionService service.ScheduleVersionService,
 ) *JobHandlers {
 	return &JobHandlers{
 		odsImporter:    odsImporter,

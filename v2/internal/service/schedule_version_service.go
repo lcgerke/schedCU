@@ -9,18 +9,18 @@ import (
 	"github.com/schedcu/v2/internal/repository"
 )
 
-// ScheduleVersionService manages schedule versions (creation, promotion, archival)
-type ScheduleVersionService struct {
+// scheduleVersionService is the concrete implementation of ScheduleVersionService
+type scheduleVersionService struct {
 	repo repository.ScheduleVersionRepository
 }
 
 // NewScheduleVersionService creates a new schedule version service
-func NewScheduleVersionService(repo repository.ScheduleVersionRepository) *ScheduleVersionService {
-	return &ScheduleVersionService{repo: repo}
+func NewScheduleVersionService(repo repository.ScheduleVersionRepository) ScheduleVersionService {
+	return &scheduleVersionService{repo: repo}
 }
 
 // CreateVersion creates a new schedule version in STAGING status
-func (s *ScheduleVersionService) CreateVersion(
+func (s *scheduleVersionService) CreateVersion(
 	ctx context.Context,
 	hospitalID entity.HospitalID,
 	startDate, endDate entity.Date,
@@ -45,7 +45,7 @@ func (s *ScheduleVersionService) CreateVersion(
 }
 
 // GetVersion retrieves a schedule version by ID
-func (s *ScheduleVersionService) GetVersion(
+func (s *scheduleVersionService) GetVersion(
 	ctx context.Context,
 	id entity.ScheduleVersionID,
 ) (*entity.ScheduleVersion, error) {
@@ -59,7 +59,7 @@ func (s *ScheduleVersionService) GetVersion(
 }
 
 // GetActiveVersion retrieves the active (PRODUCTION) version for a hospital on a given date
-func (s *ScheduleVersionService) GetActiveVersion(
+func (s *scheduleVersionService) GetActiveVersion(
 	ctx context.Context,
 	hospitalID entity.HospitalID,
 	date entity.Date,
@@ -74,7 +74,7 @@ func (s *ScheduleVersionService) GetActiveVersion(
 }
 
 // ListVersionsByStatus lists all versions for a hospital with a specific status
-func (s *ScheduleVersionService) ListVersionsByStatus(
+func (s *scheduleVersionService) ListVersionsByStatus(
 	ctx context.Context,
 	hospitalID entity.HospitalID,
 	status entity.VersionStatus,
@@ -89,7 +89,7 @@ func (s *ScheduleVersionService) ListVersionsByStatus(
 }
 
 // ListAllVersions lists all versions for a hospital
-func (s *ScheduleVersionService) ListAllVersions(
+func (s *scheduleVersionService) ListAllVersions(
 	ctx context.Context,
 	hospitalID entity.HospitalID,
 ) ([]*entity.ScheduleVersion, error) {
@@ -104,7 +104,7 @@ func (s *ScheduleVersionService) ListAllVersions(
 
 // PromoteToProduction transitions a version from STAGING to PRODUCTION
 // This makes it the active schedule that staff see
-func (s *ScheduleVersionService) PromoteToProduction(
+func (s *scheduleVersionService) PromoteToProduction(
 	ctx context.Context,
 	id entity.ScheduleVersionID,
 	promoterID entity.UserID,
@@ -134,7 +134,7 @@ func (s *ScheduleVersionService) PromoteToProduction(
 
 // Archive transitions a version from PRODUCTION to ARCHIVED
 // This removes it as the active schedule
-func (s *ScheduleVersionService) Archive(
+func (s *scheduleVersionService) Archive(
 	ctx context.Context,
 	id entity.ScheduleVersionID,
 	archiverID entity.UserID,
@@ -164,7 +164,7 @@ func (s *ScheduleVersionService) Archive(
 
 // Delete performs a soft delete on a schedule version
 // This prevents accidental deletion of historical data
-func (s *ScheduleVersionService) Delete(
+func (s *scheduleVersionService) Delete(
 	ctx context.Context,
 	id entity.ScheduleVersionID,
 	deleterID entity.UserID,
@@ -179,7 +179,7 @@ func (s *ScheduleVersionService) Delete(
 
 // PromoteAndArchiveOthers promotes a version to PRODUCTION and archives any other PRODUCTION versions
 // This ensures only one PRODUCTION version exists at a time
-func (s *ScheduleVersionService) PromoteAndArchiveOthers(
+func (s *scheduleVersionService) PromoteAndArchiveOthers(
 	ctx context.Context,
 	id entity.ScheduleVersionID,
 	promoterID entity.UserID,

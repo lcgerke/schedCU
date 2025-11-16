@@ -10,12 +10,12 @@ import (
 	"github.com/schedcu/v2/internal/validation"
 )
 
-// ODSImportService handles importing schedules from ODS (OpenDocument Spreadsheet) files
-type ODSImportService struct {
+// odsImportService is the concrete implementation of ODSImportService
+type odsImportService struct {
 	shiftRepo      repository.ShiftInstanceRepository
 	assignmentRepo repository.AssignmentRepository
 	versionRepo    repository.ScheduleVersionRepository
-	coverageCalc   *DynamicCoverageCalculator
+	coverageCalc   CoverageCalculator
 }
 
 // NewODSImportService creates a new ODS import service
@@ -23,9 +23,9 @@ func NewODSImportService(
 	shiftRepo repository.ShiftInstanceRepository,
 	assignmentRepo repository.AssignmentRepository,
 	versionRepo repository.ScheduleVersionRepository,
-	coverageCalc *DynamicCoverageCalculator,
-) *ODSImportService {
-	return &ODSImportService{
+	coverageCalc CoverageCalculator,
+) ODSImportService {
+	return &odsImportService{
 		shiftRepo:      shiftRepo,
 		assignmentRepo: assignmentRepo,
 		versionRepo:    versionRepo,
@@ -35,7 +35,7 @@ func NewODSImportService(
 
 // ImportODSFile imports a schedule from an ODS file
 // Returns a ScrapeBatch, a validation result (with all issues collected), and any fatal errors
-func (s *ODSImportService) ImportODSFile(
+func (s *odsImportService) ImportODSFile(
 	ctx context.Context,
 	hospitalID entity.HospitalID,
 	version *entity.ScheduleVersion,
@@ -89,7 +89,7 @@ func (s *ODSImportService) ImportODSFile(
 }
 
 // importSchedule imports a single schedule into the database
-func (s *ODSImportService) importSchedule(
+func (s *odsImportService) importSchedule(
 	ctx context.Context,
 	version *entity.ScheduleVersion,
 	sched *parsedSchedule,
@@ -144,7 +144,7 @@ func (s *ODSImportService) importSchedule(
 
 // parseODSFile parses an ODS file and returns schedules
 // This is a placeholder for Phase 1b; real implementation in Phase 3
-func (s *ODSImportService) parseODSFile(
+func (s *odsImportService) parseODSFile(
 	ctx context.Context,
 	content io.Reader,
 ) ([]*parsedSchedule, []*validation.Message) {

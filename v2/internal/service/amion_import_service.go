@@ -10,8 +10,8 @@ import (
 	"github.com/schedcu/v2/internal/validation"
 )
 
-// AmionImportService handles scraping and importing schedules from Amion
-type AmionImportService struct {
+// amionImportService is the concrete implementation of AmionImportService
+type amionImportService struct {
 	assignmentRepo repository.AssignmentRepository
 	batchRepo      repository.ScrapeBatchRepository
 	versionRepo    repository.ScheduleVersionRepository
@@ -22,8 +22,8 @@ func NewAmionImportService(
 	assignmentRepo repository.AssignmentRepository,
 	batchRepo repository.ScrapeBatchRepository,
 	versionRepo repository.ScheduleVersionRepository,
-) *AmionImportService {
-	return &AmionImportService{
+) AmionImportService {
+	return &amionImportService{
 		assignmentRepo: assignmentRepo,
 		batchRepo:      batchRepo,
 		versionRepo:    versionRepo,
@@ -41,7 +41,7 @@ type AmionScraperConfig struct {
 
 // ScrapeAndImport scrapes Amion and imports the data as a batch
 // Returns a ScrapeBatch and validation result (with all issues collected)
-func (s *AmionImportService) ScrapeAndImport(
+func (s *amionImportService) ScrapeAndImport(
 	ctx context.Context,
 	hospitalID entity.HospitalID,
 	version *entity.ScheduleVersion,
@@ -94,7 +94,7 @@ func (s *AmionImportService) ScrapeAndImport(
 }
 
 // importScrapedSchedule imports assignments from scraped Amion data
-func (s *AmionImportService) importScrapedSchedule(
+func (s *amionImportService) importScrapedSchedule(
 	ctx context.Context,
 	version *entity.ScheduleVersion,
 	scraped *scrapedAmionSchedule,
@@ -129,7 +129,7 @@ func (s *AmionImportService) importScrapedSchedule(
 
 // scrapeAmion scrapes Amion for schedule data
 // This is a placeholder for Phase 1b; real implementation in Phase 3
-func (s *AmionImportService) scrapeAmion(
+func (s *amionImportService) scrapeAmion(
 	ctx context.Context,
 	config AmionScraperConfig,
 ) ([]*scrapedAmionSchedule, []*validation.Message) {
@@ -166,7 +166,7 @@ type scrapedAmionAssignment struct {
 
 // VerifyAmionConnection verifies that Amion is accessible
 // Used as a health check before scraping
-func (s *AmionImportService) VerifyAmionConnection(ctx context.Context, config AmionScraperConfig) error {
+func (s *amionImportService) VerifyAmionConnection(ctx context.Context, config AmionScraperConfig) error {
 	// TODO: Implement health check against Amion
 	// Would verify authentication and basic connectivity
 	return nil

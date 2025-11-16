@@ -11,14 +11,14 @@ import (
 	"github.com/schedcu/v2/internal/validation"
 )
 
-// ODSParser handles parsing of OpenDocument Spreadsheet files (ODS)
-type ODSParser struct {
+// odsParser is the concrete implementation of ODSParser
+type odsParser struct {
 	sheetNameParser *SheetNameParser
 }
 
 // NewODSParser creates a new ODS parser
-func NewODSParser() *ODSParser {
-	return &ODSParser{
+func NewODSParser() ODSParser {
+	return &odsParser{
 		sheetNameParser: NewSheetNameParser(),
 	}
 }
@@ -51,7 +51,7 @@ type CoverageCell struct {
 }
 
 // ParseFile parses an ODS file and returns the extracted data
-func (p *ODSParser) ParseFile(filePath string, result *validation.Result) (*ODSData, error) {
+func (p *odsParser) ParseFile(filePath string, result *validation.Result) (*ODSData, error) {
 	// Open ZIP file (ODS is a ZIP archive)
 	zipReader, err := zip.OpenReader(filePath)
 	if err != nil {
@@ -167,7 +167,7 @@ type tableElement struct {
 }
 
 // parseSheetFromElement parses a sheet from the table element
-func (p *ODSParser) parseSheetFromElement(table *tableElement, result *validation.Result) *ODSSheet {
+func (p *odsParser) parseSheetFromElement(table *tableElement, result *validation.Result) *ODSSheet {
 	sheet := &ODSSheet{
 		Name: table.Name,
 	}
@@ -197,7 +197,7 @@ func (p *ODSParser) parseSheetFromElement(table *tableElement, result *validatio
 }
 
 // extractCoverageGridFromTable parses coverage assignments from the cell grid
-func (p *ODSParser) extractCoverageGridFromTable(grid [][]string, result *validation.Result) []CoverageCell {
+func (p *odsParser) extractCoverageGridFromTable(grid [][]string, result *validation.Result) []CoverageCell {
 	var coverageGrid []CoverageCell
 
 	// Find header row (first row with shift type names)
@@ -254,7 +254,7 @@ func (p *ODSParser) extractCoverageGridFromTable(grid [][]string, result *valida
 }
 
 // findHeaderRow finds the row containing shift type names
-func (p *ODSParser) findHeaderRow(grid [][]string) int {
+func (p *odsParser) findHeaderRow(grid [][]string) int {
 	shiftTypePatterns := []string{"Mid", "ON", "Day", "Night", "MidC", "MidL", "ON1", "ON2"}
 
 	for i, row := range grid {
@@ -283,7 +283,7 @@ type ShiftColumn struct {
 }
 
 // extractShiftColumns identifies columns with shift type headers
-func (p *ODSParser) extractShiftColumns(headerRow []string) []ShiftColumn {
+func (p *odsParser) extractShiftColumns(headerRow []string) []ShiftColumn {
 	var columns []ShiftColumn
 
 	for colIdx, cell := range headerRow {
@@ -306,7 +306,7 @@ func (p *ODSParser) extractShiftColumns(headerRow []string) []ShiftColumn {
 }
 
 // normalizeShiftType normalizes shift type names found in headers
-func (p *ODSParser) normalizeShiftType(name string) string {
+func (p *odsParser) normalizeShiftType(name string) string {
 	name = strings.TrimSpace(name)
 	if name == "" {
 		return ""

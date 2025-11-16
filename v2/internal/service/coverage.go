@@ -11,9 +11,9 @@ import (
 	"github.com/schedcu/v2/internal/validation"
 )
 
-// DynamicCoverageCalculator handles coverage calculation with batch query optimization
+// dynamicCoverageCalculator is the concrete implementation of CoverageCalculator
 // CRITICAL: Implements batch queries to prevent N+1 query problems from v1
-type DynamicCoverageCalculator struct {
+type dynamicCoverageCalculator struct {
 	shiftRepo      repository.ShiftInstanceRepository
 	assignmentRepo repository.AssignmentRepository
 }
@@ -22,8 +22,8 @@ type DynamicCoverageCalculator struct {
 func NewDynamicCoverageCalculator(
 	shiftRepo repository.ShiftInstanceRepository,
 	assignmentRepo repository.AssignmentRepository,
-) *DynamicCoverageCalculator {
-	return &DynamicCoverageCalculator{
+) CoverageCalculator {
+	return &dynamicCoverageCalculator{
 		shiftRepo:      shiftRepo,
 		assignmentRepo: assignmentRepo,
 	}
@@ -32,7 +32,7 @@ func NewDynamicCoverageCalculator(
 // CalculateCoverageForSchedule computes coverage for a schedule version over a date range
 // Uses batch queries to achieve O(1) query complexity regardless of schedule size
 // PREVENTS N+1: All shifts loaded in single batch, not one query per shift
-func (c *DynamicCoverageCalculator) CalculateCoverageForSchedule(
+func (c *dynamicCoverageCalculator) CalculateCoverageForSchedule(
 	ctx context.Context,
 	scheduleVersionID entity.ScheduleVersionID,
 	startDate time.Time,
@@ -82,7 +82,7 @@ func (c *DynamicCoverageCalculator) CalculateCoverageForSchedule(
 }
 
 // CalculateCoverage computes coverage and returns validation result
-func (c *DynamicCoverageCalculator) CalculateCoverage(
+func (c *dynamicCoverageCalculator) CalculateCoverage(
 	ctx context.Context,
 	scheduleVersionID entity.ScheduleVersionID,
 	startDate time.Time,
@@ -103,7 +103,7 @@ func (c *DynamicCoverageCalculator) CalculateCoverage(
 
 // aggregateCoverage groups shifts by position and counts coverage
 // Returns map of position → total count
-func (c *DynamicCoverageCalculator) aggregateCoverage(
+func (c *dynamicCoverageCalculator) aggregateCoverage(
 	shifts []*entity.ShiftInstance,
 	assignments []*entity.Assignment,
 ) map[string]int {
@@ -139,7 +139,7 @@ func (c *DynamicCoverageCalculator) aggregateCoverage(
 
 // getPositionKey creates a unique key for aggregation
 // Combines shift type, study type, and specialty constraint
-func (c *DynamicCoverageCalculator) getPositionKey(shift *entity.ShiftInstance) string {
+func (c *dynamicCoverageCalculator) getPositionKey(shift *entity.ShiftInstance) string {
 	return fmt.Sprintf("%s_%s_%s",
 		shift.ShiftType,
 		shift.StudyType,
@@ -148,7 +148,7 @@ func (c *DynamicCoverageCalculator) getPositionKey(shift *entity.ShiftInstance) 
 }
 
 // buildSummary creates a summary of coverage statistics
-func (c *DynamicCoverageCalculator) buildSummary(
+func (c *dynamicCoverageCalculator) buildSummary(
 	coverage map[string]int,
 	shifts []*entity.ShiftInstance,
 ) map[string]interface{} {
@@ -185,7 +185,7 @@ func (c *DynamicCoverageCalculator) buildSummary(
 }
 
 // ValidateCoverage checks for coverage gaps
-func (c *DynamicCoverageCalculator) ValidateCoverage(
+func (c *dynamicCoverageCalculator) ValidateCoverage(
 	ctx context.Context,
 	coverage *entity.CoverageCalculation,
 ) *validation.Result {
@@ -210,7 +210,7 @@ func (c *DynamicCoverageCalculator) ValidateCoverage(
 }
 
 // CompareVersionCoverage compares coverage between two schedule versions
-func (c *DynamicCoverageCalculator) CompareVersionCoverage(
+func (c *dynamicCoverageCalculator) CompareVersionCoverage(
 	ctx context.Context,
 	oldVersionID, newVersionID entity.ScheduleVersionID,
 	startDate time.Time,

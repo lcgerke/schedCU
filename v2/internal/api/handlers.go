@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -61,7 +60,7 @@ func (h *Handlers) CreateScheduleVersion(c echo.Context) error {
 
 	// Create version
 	version, err := h.services.VersionService.CreateVersion(
-		context.Background(),
+		c.Request().Context(),
 		hospitalID,
 		startDate,
 		endDate,
@@ -87,7 +86,7 @@ func (h *Handlers) GetScheduleVersion(c echo.Context) error {
 	id := c.Param("id")
 	versionID := entity.ScheduleVersionID(uuid.MustParse(id))
 
-	version, err := h.services.VersionService.GetVersion(context.Background(), versionID)
+	version, err := h.services.VersionService.GetVersion(c.Request().Context(), versionID)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, ErrorResponseWithCode("NOT_FOUND", "Schedule version not found"))
 	}
@@ -104,7 +103,7 @@ func (h *Handlers) ListScheduleVersions(c echo.Context) error {
 
 	hID := entity.HospitalID(uuid.MustParse(hospitalID))
 
-	versions, err := h.services.VersionService.ListAllVersions(context.Background(), hID)
+	versions, err := h.services.VersionService.ListAllVersions(c.Request().Context(), hID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, ErrorResponseWithCode("LIST_FAILED", fmt.Sprintf("Failed to list versions: %v", err)))
 	}
@@ -121,11 +120,11 @@ func (h *Handlers) PromoteScheduleVersion(c echo.Context) error {
 	promoterID := entity.UserID(uuid.New())
 
 	// Promote to production (and archive others)
-	if err := h.services.VersionService.PromoteAndArchiveOthers(context.Background(), versionID, promoterID); err != nil {
+	if err := h.services.VersionService.PromoteAndArchiveOthers(c.Request().Context(), versionID, promoterID); err != nil {
 		return c.JSON(http.StatusInternalServerError, ErrorResponseWithCode("PROMOTE_FAILED", fmt.Sprintf("Failed to promote version: %v", err)))
 	}
 
-	version, _ := h.services.VersionService.GetVersion(context.Background(), versionID)
+	version, _ := h.services.VersionService.GetVersion(c.Request().Context(), versionID)
 
 	return c.JSON(http.StatusOK, SuccessResponse(version))
 }
@@ -138,11 +137,11 @@ func (h *Handlers) ArchiveScheduleVersion(c echo.Context) error {
 	// TODO: Get archiver ID from authenticated user
 	archiverID := entity.UserID(uuid.New())
 
-	if err := h.services.VersionService.Archive(context.Background(), versionID, archiverID); err != nil {
+	if err := h.services.VersionService.Archive(c.Request().Context(), versionID, archiverID); err != nil {
 		return c.JSON(http.StatusInternalServerError, ErrorResponseWithCode("ARCHIVE_FAILED", fmt.Sprintf("Failed to archive version: %v", err)))
 	}
 
-	version, _ := h.services.VersionService.GetVersion(context.Background(), versionID)
+	version, _ := h.services.VersionService.GetVersion(c.Request().Context(), versionID)
 
 	return c.JSON(http.StatusOK, SuccessResponse(version))
 }
@@ -199,11 +198,11 @@ func (h *Handlers) UploadODSFile(c echo.Context) error {
 	}
 
 	// Parse ODS file
-	ctx := context.Background()
-	validation := validation.NewResult()
+	ctx := c.Request().Context()
+	validationResult := validation.NewResult()
 	parser := service.NewODSParser()
 
-	odsData, err := parser.ParseFile(tempFile, validation)
+	odsData, err := parser.ParseFile(tempFile, validationResult)
 	defer os.Remove(tempFile) // Clean up temp file
 
 	if err != nil {
@@ -263,7 +262,7 @@ func (h *Handlers) StartODSImport(c echo.Context) error {
 	versionID := entity.ScheduleVersionID(uuid.MustParse(req.ScheduleVersionID))
 
 	// Get version to get hospital ID
-	version, err := h.services.VersionService.GetVersion(context.Background(), versionID)
+	version, err := h.services.VersionService.GetVersion(c.Request().Context(), versionID)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, ErrorResponseWithCode("ERROR", "Schedule version not found"))
 	}
@@ -272,7 +271,7 @@ func (h *Handlers) StartODSImport(c echo.Context) error {
 	creatorID := entity.UserID(uuid.New())
 
 	// Enqueue import job
-	info, err := h.scheduler.EnqueueODSImport(context.Background(), version.HospitalID, versionID, req.Filename, creatorID)
+	info, err := h.scheduler.EnqueueODSImport(c.Request().Context(), version.HospitalID, versionID, req.Filename, creatorID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, ErrorResponseWithCode("ERROR", fmt.Sprintf("Failed to enqueue job: %v", err)))
 	}
@@ -310,7 +309,7 @@ func (h *Handlers) StartAmionImport(c echo.Context) error {
 	versionID := entity.ScheduleVersionID(uuid.MustParse(req.ScheduleVersionID))
 
 	// Get version to get hospital ID
-	version, err := h.services.VersionService.GetVersion(context.Background(), versionID)
+	version, err := h.services.VersionService.GetVersion(c.Request().Context(), versionID)
 	if err != nil {
 		return c.JSON(http.StatusNotFound, ErrorResponseWithCode("ERROR", "Schedule version not found"))
 	}
@@ -319,7 +318,7 @@ func (h *Handlers) StartAmionImport(c echo.Context) error {
 	creatorID := entity.UserID(uuid.New())
 
 	// Enqueue scrape job
-	info, err := h.scheduler.EnqueueAmionScrape(context.Background(), version.HospitalID, versionID, req.MonthsBack, req.Username, creatorID)
+	info, err := h.scheduler.EnqueueAmionScrape(c.Request().Context(), version.HospitalID, versionID, req.MonthsBack, req.Username, creatorID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, ErrorResponseWithCode("ERROR", fmt.Sprintf("Failed to enqueue job: %v", err)))
 	}
@@ -408,7 +407,7 @@ func (h *Handlers) CalculateCoverage(c echo.Context) error {
 	creatorID := entity.UserID(uuid.New())
 
 	// Enqueue job
-	info, err := h.scheduler.EnqueueCoverageCalculation(context.Background(), versionID, startDate, endDate, creatorID)
+	info, err := h.scheduler.EnqueueCoverageCalculation(c.Request().Context(), versionID, startDate, endDate, creatorID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, ErrorResponseWithCode("ERROR", fmt.Sprintf("Failed to enqueue job: %v", err)))
 	}

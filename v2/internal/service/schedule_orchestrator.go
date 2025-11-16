@@ -9,25 +9,25 @@ import (
 	"github.com/schedcu/v2/internal/validation"
 )
 
-// ScheduleOrchestrator coordinates the complete schedule update workflow
+// scheduleOrchestrator is the concrete implementation of ScheduleOrchestrator
 // Phase 1: ODS Import (upload file)
 // Phase 2: Amion Import (scrape web)
 // Phase 3: Coverage Resolution (calculate coverage)
-type ScheduleOrchestrator struct {
-	odsImporter    *ODSImportService
-	amionImporter  *AmionImportService
-	coverageCalc   *DynamicCoverageCalculator
-	versionService *ScheduleVersionService
+type scheduleOrchestrator struct {
+	odsImporter    ODSImportService
+	amionImporter  AmionImportService
+	coverageCalc   CoverageCalculator
+	versionService ScheduleVersionService
 }
 
 // NewScheduleOrchestrator creates a new orchestrator
 func NewScheduleOrchestrator(
-	odsImporter *ODSImportService,
-	amionImporter *AmionImportService,
-	coverageCalc *DynamicCoverageCalculator,
-	versionService *ScheduleVersionService,
-) *ScheduleOrchestrator {
-	return &ScheduleOrchestrator{
+	odsImporter ODSImportService,
+	amionImporter AmionImportService,
+	coverageCalc CoverageCalculator,
+	versionService ScheduleVersionService,
+) ScheduleOrchestrator {
+	return &scheduleOrchestrator{
 		odsImporter:    odsImporter,
 		amionImporter:  amionImporter,
 		coverageCalc:   coverageCalc,
@@ -48,7 +48,7 @@ type WorkflowResult struct {
 
 // ExecuteFullWorkflow executes the complete 3-phase workflow
 // Returns detailed results showing success/failure at each phase
-func (o *ScheduleOrchestrator) ExecuteFullWorkflow(
+func (o *scheduleOrchestrator) ExecuteFullWorkflow(
 	ctx context.Context,
 	hospitalID entity.HospitalID,
 	creatorID entity.UserID,
@@ -155,7 +155,7 @@ func (o *ScheduleOrchestrator) ExecuteFullWorkflow(
 }
 
 // validateCoverageAcceptable checks if coverage levels are acceptable
-func (o *ScheduleOrchestrator) validateCoverageAcceptable(coverage *entity.CoverageCalculation) bool {
+func (o *scheduleOrchestrator) validateCoverageAcceptable(coverage *entity.CoverageCalculation) bool {
 	// Check if any position has 0% coverage
 	// This is a simplified check; real implementation would be more nuanced
 	if coverage.CoverageSummary != nil {
@@ -168,7 +168,7 @@ func (o *ScheduleOrchestrator) validateCoverageAcceptable(coverage *entity.Cover
 
 // PreviewWorkflow executes the workflow but reverts changes (dry-run)
 // Useful for reviewing changes before committing
-func (o *ScheduleOrchestrator) PreviewWorkflow(
+func (o *scheduleOrchestrator) PreviewWorkflow(
 	ctx context.Context,
 	hospitalID entity.HospitalID,
 	creatorID entity.UserID,
@@ -190,7 +190,7 @@ func (o *ScheduleOrchestrator) PreviewWorkflow(
 }
 
 // CompareVersions compares two schedule versions to show what changed
-func (o *ScheduleOrchestrator) CompareVersions(
+func (o *scheduleOrchestrator) CompareVersions(
 	ctx context.Context,
 	oldVersionID, newVersionID entity.ScheduleVersionID,
 ) (*VersionComparison, error) {

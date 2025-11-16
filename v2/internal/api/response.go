@@ -3,15 +3,15 @@ package api
 import (
 	"time"
 
-	"github.com/schedcu/v2/internal/entity"
+	"github.com/schedcu/v2/internal/validation"
 )
 
 // APIResponse is the standard response format for all endpoints.
 type APIResponse struct {
-	Data              interface{}              `json:"data,omitempty"`
-	ValidationResult  *entity.ValidationResult `json:"validation,omitempty"`
-	Error             *ErrorResponse           `json:"error,omitempty"`
-	Meta              ResponseMeta             `json:"meta"`
+	Data             interface{}         `json:"data,omitempty"`
+	ValidationResult *validation.Result  `json:"validation,omitempty"`
+	Error            *ErrorResponse      `json:"error,omitempty"`
+	Meta             ResponseMeta        `json:"meta"`
 }
 
 // ErrorResponse contains error details.
@@ -30,8 +30,8 @@ type ResponseMeta struct {
 // SuccessResponse returns a successful APIResponse.
 func SuccessResponse(data interface{}) *APIResponse {
 	return &APIResponse{
-		Data: data,
-		ValidationResult: entity.NewValidationResult(),
+		Data:             data,
+		ValidationResult: validation.NewResult(), // Empty result means success
 		Meta: ResponseMeta{
 			Timestamp: time.Now().UTC(),
 			Version:   "1.0",
@@ -55,8 +55,22 @@ func ErrorResponseWithCode(code, message string) *APIResponse {
 
 // ValidationErrorResponse returns a validation error APIResponse.
 func ValidationErrorResponse(code, message string) *APIResponse {
+	result := validation.NewResult()
+	result.AddError(code, message)
 	return &APIResponse{
-		ValidationResult: entity.NewValidationError(code, message),
+		ValidationResult: result,
+		Meta: ResponseMeta{
+			Timestamp: time.Now().UTC(),
+			Version:   "1.0",
+		},
+	}
+}
+
+// ResponseWithValidation returns an APIResponse with custom validation result.
+func ResponseWithValidation(data interface{}, validationResult *validation.Result) *APIResponse {
+	return &APIResponse{
+		Data:             data,
+		ValidationResult: validationResult,
 		Meta: ResponseMeta{
 			Timestamp: time.Now().UTC(),
 			Version:   "1.0",

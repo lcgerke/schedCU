@@ -61,6 +61,7 @@ type HospitalRepository interface {
 type PersonRepository interface {
 	Create(ctx context.Context, person *entity.Person) error
 	GetByID(ctx context.Context, id uuid.UUID) (*entity.Person, error)
+	GetAllByIDs(ctx context.Context, ids []uuid.UUID) ([]*entity.Person, error) // Batch query
 	GetByEmail(ctx context.Context, email string) (*entity.Person, error)
 	GetByHospital(ctx context.Context, hospitalID uuid.UUID) ([]*entity.Person, error)
 	Update(ctx context.Context, person *entity.Person) error
