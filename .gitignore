@@ -51,3 +51,10 @@ secrets.yml
 secrets.yaml
 config/secrets.*
 
+
+# Go compiled binaries
+/v2/server
+/reimplement/generate-ods-fixtures
+*.exe
+server
+generate-ods-fixtures
