@@ -55,6 +55,7 @@ config/secrets.*
 # Go compiled binaries
 /v2/server
 /reimplement/generate-ods-fixtures
+/reimplement/validate-coverage
 /reimplement/cmd/validate-coverage-go/validate-coverage
 /reimplement/cmd/spanning-sets/spanning-sets
 /reimplement/cmd/describe-studies-go/describe-studies-go
