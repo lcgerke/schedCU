@@ -210,6 +210,11 @@ func (h *Handlers) UploadODSFile(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, ErrorResponseWithCode("PARSE_ERROR", "Failed to parse ODS file"))
 	}
 
+	// Validate schedule_version_id is provided
+	if req.ScheduleVersionID == "" {
+		return c.JSON(http.StatusBadRequest, ErrorResponseWithCode("INVALID_REQUEST", "Missing or invalid schedule_version_id"))
+	}
+
 	// Get schedule version
 	versionID := entity.ScheduleVersionID(uuid.MustParse(req.ScheduleVersionID))
 	version, err := h.services.VersionService.GetVersion(ctx, versionID)
