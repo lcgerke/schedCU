@@ -71,7 +71,8 @@ func (r *Router) registerRoutes() {
 
 	// Import operations
 	importGroup := r.echo.Group("/api/imports")
-	importGroup.POST("/ods", r.handlers.StartODSImport)
+	importGroup.POST("/ods/upload", r.handlers.UploadODSFile) // File upload handler
+	importGroup.POST("/ods", r.handlers.StartODSImport)       // Start import job
 	importGroup.POST("/amion", r.handlers.StartAmionImport)
 	importGroup.POST("/full-workflow", r.handlers.StartFullWorkflow)
 	importGroup.GET("/:jobID/status", r.handlers.GetJobStatus)

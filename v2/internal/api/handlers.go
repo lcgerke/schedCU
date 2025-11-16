@@ -3,12 +3,19 @@ package api
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/schedcu/v2/internal/entity"
 	"github.com/schedcu/v2/internal/job"
+	"github.com/schedcu/v2/internal/service"
+	"github.com/schedcu/v2/internal/validation"
 )
 
 // Handlers contains all HTTP request handlers
@@ -140,6 +147,100 @@ func (h *Handlers) ArchiveScheduleVersion(c echo.Context) error {
 	return c.JSON(http.StatusOK, SuccessResponse(version))
 }
 
+// UploadODSRequest represents a multipart upload request for ODS files
+type UploadODSRequest struct {
+	ScheduleVersionID string `form:"schedule_version_id" validate:"required"`
+}
+
+// UploadODSFile handles file upload and returns parsed data
+func (h *Handlers) UploadODSFile(c echo.Context) error {
+	// Parse form
+	var req UploadODSRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, ErrorResponseWithCode("INVALID_REQUEST", "Missing schedule_version_id"))
+	}
+
+	// Get uploaded file
+	file, err := c.FormFile("file")
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, ErrorResponseWithCode("MISSING_FILE", "No ODS file provided"))
+	}
+
+	// Validate file extension
+	if !strings.HasSuffix(strings.ToLower(file.Filename), ".ods") {
+		return c.JSON(http.StatusBadRequest, ErrorResponseWithCode("INVALID_FILE_TYPE", "File must be .ods format"))
+	}
+
+	// Validate file size (max 10MB)
+	const maxFileSize = 10 * 1024 * 1024
+	if file.Size > maxFileSize {
+		return c.JSON(http.StatusBadRequest, ErrorResponseWithCode("FILE_TOO_LARGE", "File must be smaller than 10MB"))
+	}
+
+	// Read file into temporary location
+	src, err := file.Open()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, ErrorResponseWithCode("FILE_READ_ERROR", "Failed to read uploaded file"))
+	}
+	defer src.Close()
+
+	// Create temporary file
+	tempDir := os.TempDir()
+	tempFile := filepath.Join(tempDir, fmt.Sprintf("ods_%s_%d.ods", uuid.New().String()[:8], time.Now().Unix()))
+	dst, err := os.Create(tempFile)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, ErrorResponseWithCode("FILE_WRITE_ERROR", "Failed to save uploaded file"))
+	}
+	defer dst.Close()
+
+	if _, err := io.Copy(dst, src); err != nil {
+		os.Remove(tempFile)
+		return c.JSON(http.StatusInternalServerError, ErrorResponseWithCode("FILE_WRITE_ERROR", "Failed to save uploaded file"))
+	}
+
+	// Parse ODS file
+	ctx := context.Background()
+	validation := validation.NewResult()
+	parser := service.NewODSParser()
+
+	odsData, err := parser.ParseFile(tempFile, validation)
+	defer os.Remove(tempFile) // Clean up temp file
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, ErrorResponseWithCode("PARSE_ERROR", "Failed to parse ODS file"))
+	}
+
+	// Get schedule version
+	versionID := entity.ScheduleVersionID(uuid.MustParse(req.ScheduleVersionID))
+	version, err := h.services.VersionService.GetVersion(ctx, versionID)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, ErrorResponseWithCode("VERSION_NOT_FOUND", "Schedule version not found"))
+	}
+
+	// Return parsed ODS data summary
+	sheetSummary := make([]map[string]interface{}, 0)
+	for _, sheet := range odsData.Sheets {
+		sheetSummary = append(sheetSummary, map[string]interface{}{
+			"name":              sheet.Name,
+			"shift_category":    sheet.ShiftCategory,
+			"day_type":          sheet.DayType,
+			"specialty":         sheet.SpecialtyScenario,
+			"time_start":        sheet.TimeStart.Format("15:04"),
+			"time_end":          sheet.TimeEnd.Format("15:04"),
+			"assignment_count":  len(sheet.CoverageGrid),
+		})
+	}
+
+	return c.JSON(http.StatusOK, SuccessResponse(map[string]interface{}{
+		"filename":            file.Filename,
+		"sheets_parsed":       len(odsData.Sheets),
+		"total_assignments":   getTotalAssignments(odsData),
+		"sheets":              sheetSummary,
+		"schedule_version_id": req.ScheduleVersionID,
+		"hospital_id":         version.HospitalID.String(),
+	}))
+}
+
 // StartODSImportRequest represents a request to start ODS import
 type StartODSImportRequest struct {
 	ScheduleVersionID string `json:"schedule_version_id" validate:"required"`
@@ -175,6 +276,15 @@ func (h *Handlers) StartODSImport(c echo.Context) error {
 		"job_id": info.ID,
 		"status": "queued",
 	}))
+}
+
+// Helper function to get total assignments across all sheets
+func getTotalAssignments(odsData *service.ODSData) int {
+	total := 0
+	for _, sheet := range odsData.Sheets {
+		total += len(sheet.CoverageGrid)
+	}
+	return total
 }
 
 // StartAmionImportRequest represents a request to start Amion import
