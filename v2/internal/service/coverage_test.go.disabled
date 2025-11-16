@@ -15,8 +15,10 @@ import (
 // TestCoverageCalculatorWithBatchQueries validates batch loading (no N+1 queries)
 // This is critical: v1 had N+1 query problems in coverage calculation
 func TestCoverageCalculatorWithBatchQueries(t *testing.T) {
-	repo := memory.NewScheduleRepository()
-	calc := NewCoverageCalculator(repo)
+	baseRepo := memory.NewMemoryRepository()
+	shiftRepo := memory.NewShiftInstanceRepository(baseRepo)
+	assignmentRepo := memory.NewAssignmentRepository(baseRepo)
+	calc := NewDynamicCoverageCalculator(shiftRepo, assignmentRepo)
 	ctx := context.Background()
 
 	// Create test data
@@ -75,7 +77,7 @@ func TestCoverageCalculatorWithBatchQueries(t *testing.T) {
 // TestCoverageCalculationBasic validates basic coverage calculation
 func TestCoverageCalculationBasic(t *testing.T) {
 	repo := memory.NewScheduleRepository()
-	calc := NewCoverageCalculator(repo)
+	calc := NewDynamicCoverageCalculator(shiftRepo, assignmentRepo)
 	ctx := context.Background()
 
 	hospitalID := uuid.New()
@@ -203,7 +205,7 @@ func TestCoverageCalculationBasic(t *testing.T) {
 // TestCoverageCalculationEmptySchedule validates handling empty schedules
 func TestCoverageCalculationEmptySchedule(t *testing.T) {
 	repo := memory.NewScheduleRepository()
-	calc := NewCoverageCalculator(repo)
+	calc := NewDynamicCoverageCalculator(shiftRepo, assignmentRepo)
 	ctx := context.Background()
 
 	// Create empty schedule
@@ -231,7 +233,7 @@ func TestCoverageCalculationEmptySchedule(t *testing.T) {
 // TestCoverageCalculationDateFiltering validates that only shifts in range are counted
 func TestCoverageCalculationDateFiltering(t *testing.T) {
 	repo := memory.NewScheduleRepository()
-	calc := NewCoverageCalculator(repo)
+	calc := NewDynamicCoverageCalculator(shiftRepo, assignmentRepo)
 	ctx := context.Background()
 
 	hospitalID := uuid.New()
@@ -297,7 +299,7 @@ func TestCoverageCalculationDateFiltering(t *testing.T) {
 // TestCoverageCalculationSpecialtyConstraints validates specialty constraint handling
 func TestCoverageCalculationSpecialtyConstraints(t *testing.T) {
 	repo := memory.NewScheduleRepository()
-	calc := NewCoverageCalculator(repo)
+	calc := NewDynamicCoverageCalculator(shiftRepo, assignmentRepo)
 	ctx := context.Background()
 
 	hospitalID := uuid.New()
@@ -361,7 +363,7 @@ func TestCoverageCalculationSpecialtyConstraints(t *testing.T) {
 // TestCoverageCalculationQueryCountRegression validates against N+1 regression
 func TestCoverageCalculationQueryCountRegression(t *testing.T) {
 	repo := memory.NewScheduleRepository()
-	calc := NewCoverageCalculator(repo)
+	calc := NewDynamicCoverageCalculator(shiftRepo, assignmentRepo)
 	ctx := context.Background()
 
 	hospitalID := uuid.New()

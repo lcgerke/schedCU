@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "bothcritique": {
+      "command": "/home/lcgerke/.claude/tools/bothcritique/bin/bothcritique-mcp",
+      "env": {
+        "LOG_LEVEL": "info"
+      }
+    }
+  }
+}
