@@ -55,6 +55,8 @@ config/secrets.*
 # Go compiled binaries
 /v2/server
 /reimplement/generate-ods-fixtures
+/reimplement/validate-coverage
 *.exe
 server
 generate-ods-fixtures
+validate-coverage
